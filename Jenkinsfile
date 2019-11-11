@@ -17,6 +17,12 @@ pipeline {
         timestamps()
         disableConcurrentBuilds()
     }
+    environment {
+        DOCKER_IMAGE_NAME = "docker-io.dbc.dk/tickle-repo-introspect"
+        DOCKER_IMAGE_VERSION = "${env.BRANCH_NAME}-${env.BUILD_NUMBER}"
+        DOCKER_IMAGE_DIT_VERSION = "DIT-${env.BUILD_NUMBER}"
+        GITLAB_PRIVATE_TOKEN = credentials("metascrum-gitlab-api-token")
+    }
     stages {
         stage("clear workspace") {
             steps {
@@ -50,13 +56,23 @@ pipeline {
                       failedTotalAll: "0"])
             }
         }
-        stage("docker push") {
+        stage("docker build") {
             when {
-                branch "master"
+                expression {
+                    currentBuild.result == null || currentBuild.result == 'SUCCESS'
+                }
             }
             steps {
                 script {
-                    docker.image("docker-io.dbc.dk/tickle-repo-introspect:${env.BRANCH_NAME}-${env.BUILD_NUMBER}").push()
+                    def image = docker.build("${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_VERSION}")
+                    image.push()
+
+                    if (env.BRANCH_NAME == 'master') {
+                        sh """
+                            docker tag ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_VERSION} ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_DIT_VERSION}
+                            docker push ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_DIT_VERSION}
+                        """
+                    }
                 }
             }
         }

@@ -2,15 +2,15 @@
 
 case "$1" in
     docker)
-        echo "### building tickle-introspect service docker ###"
-        docker build -f Dockerfile --pull --no-cache . -t docker-io.dbc.dk/tickle-introspect:devel || exit 1
+        echo "### building tickle-repo-introspect service docker ###"
+        docker build -f Dockerfile --pull --no-cache . -t docker-io.dbc.dk/tickle-repo-introspect:devel || exit 1
         if [[ ! -z "$BUILD_NUMBER" ]]; then
-            docker tag docker-io.dbc.dk/tickle-introspect:devel docker-io.dbc.dk/tickle-introspect:${BRANCH_NAME}-${BUILD_NUMBER}
+            docker tag docker-io.dbc.dk/tickle-repo-introspect:devel docker-io.dbc.dk/tickle-repo-introspect:${BRANCH_NAME}-${BUILD_NUMBER}
         fi
         ;;
 
     *)
-        echo "### building tickle-introspect project ###"
+        echo "### building tickle-repo-introspect project ###"
         echo "### Look for build artifacts in target/ ###"
 
         mvn package -Dmaven.test.skip=true || exit 1

@@ -1,3 +1,3 @@
-echo "### Stopping tickle-introspect service docker ###"
+echo "### Stopping tickle-repo-introspect service docker ###"
 
-docker stop tickle-introspect || exit 1
+docker stop tickle-repo-introspect || exit 1

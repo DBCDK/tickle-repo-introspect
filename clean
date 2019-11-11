@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+echo "### cleaning tickle-introspect project ###"
+
+mvn clean
+git pull --ff-only
+docker rm -f tickle-introspect &>/dev/null || true
+exit 0

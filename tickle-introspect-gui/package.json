@@ -1,0 +1,27 @@
+{
+  "name": "tickle-introspect-gui",
+  "version": "0.0.1",
+  "dependencies": {
+    "react": "^16.8.6",
+    "react-bootstrap": "^0.32.4",
+    "react-dom": "^16.8.6",
+    "superagent": "^5.1.0"
+  },
+  "license": "GPL-3.0",
+  "scripts": {
+    "build": "webpack -p",
+    "dev-server": "webpack-dev-server"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.3",
+    "babel-loader": "^7.1.5",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-stage-0": "^6.24.1",
+    "babel-preset-react": "^6.24.1",
+    "webpack": "4.35.3",
+    "webpack-cli": "3.3.6",
+    "webpack-dev-server": "3.7.2"
+  },
+  "description": "Tickle GUI"
+}

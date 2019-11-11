@@ -4,4 +4,4 @@ LABEL INSTANCE="Name of the instance of this Tickle introspect. Typically the na
 
 USER root
 
-COPY tickle-introspect-api/target/tickle-introspect-api-*.war app.json deployments/
+COPY tickle-repo-introspect-api/target/tickle-repo-introspect-api-*.war app.json deployments/

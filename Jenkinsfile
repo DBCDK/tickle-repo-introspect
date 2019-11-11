@@ -56,7 +56,7 @@ pipeline {
             }
             steps {
                 script {
-                    docker.image("docker-io.dbc.dk/tickle-introspect-example:${env.BRANCH_NAME}-${env.BUILD_NUMBER}").push()
+                    docker.image("docker-io.dbc.dk/tickle-repo-introspect:${env.BRANCH_NAME}-${env.BUILD_NUMBER}").push()
                 }
             }
         }

@@ -1,5 +1,5 @@
 {
-  "name": "tickle-introspect-gui",
+  "name": "tickle-repo-introspect",
   "version": "0.0.1",
   "dependencies": {
     "react": "^16.8.6",

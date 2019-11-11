@@ -9,12 +9,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <artifactId>tickle-introspect</artifactId>
+        <artifactId>tickle-repo-introspect</artifactId>
         <groupId>dk.dbc</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>tickle-introspect-gui</artifactId>
+    <artifactId>tickle-repo-introspect-gui</artifactId>
     <packaging>jar</packaging>
 
     <build>

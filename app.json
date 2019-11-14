@@ -1,3 +1,8 @@
 {
-  "appName": "tickle-repo-introspect"
+  "appName": "tickle-repo-introspect",
+  "jdbc": {
+    "jdbc/tickle-repo": {
+      "url": "${TICKLE_REPO_URL}"
+    }
+  }
 }

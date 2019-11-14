@@ -76,5 +76,24 @@ pipeline {
                 }
             }
         }
+        stage("bump docker tag in staging deployments") {
+            agent {
+                docker {
+                    label workerNode
+                    image "docker.dbc.dk/build-env:latest"
+                    alwaysPull true
+                }
+            }
+            when {
+                branch "master"
+            }
+            steps {
+                script {
+                    sh """  
+                        set-new-version services/tickle-repo-introspect.yml ${env.GITLAB_PRIVATE_TOKEN} metascrum/tickle-repo-introspect-secrets ${DOCKER_IMAGE_DIT_VERSION} -b staging
+                    """
+                }
+            }
+        }
     }
 }

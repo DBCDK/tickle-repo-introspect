@@ -26,6 +26,10 @@ class TickleIntrospectGUI extends React.Component {
         if (this.state.instance === '') {
             this.getInstance();
         }
+        // Todo: not here
+        if (this.state.datasets === '') {
+            this.getDatasets();
+        }
     }
 
     handleSelect(view) {
@@ -48,11 +52,29 @@ class TickleIntrospectGUI extends React.Component {
             });
     }
 
+    getDatasets() {
+        request
+            .get('/api/v1/datasets')
+            .set('Content-Type', 'text/plain')
+            .then(res => {
+                const datasets = res.text;
+                this.setState({
+                    datasets: datasets
+                });
+                document.title = "Tickle Repo (" + datasets + ")";
+            })
+            .catch(err => {
+                alert(err.message);
+            });
+    }
+
     render() {
         return (
             <div style={{width: '100%', overflow: 'hidden'}}>
                 <div>
                     <h2>Tickle Repo <b>{this.state.instance}</b></h2>
+                    // todo: not here
+                    <h2>Datasets <b>{this.state.datasets}</b></h2>
                 </div>
                 <div>
                     <Tabs activeKey={this.state.view}

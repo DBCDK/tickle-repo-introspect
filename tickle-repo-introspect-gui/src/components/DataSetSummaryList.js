@@ -1,0 +1,67 @@
+/*
+ * Copyright Dansk Bibliotekscenter a/s. Licensed under GNU GPL v3
+ * See license text at https://opensource.dbc.dk/licenses/gpl-3.0
+ */
+
+import React from "react";
+import {BootstrapTable, TableHeaderColumn} from "react-bootstrap-table";
+
+class DataSetSummaryList extends React.Component {
+
+    constructor(props) {
+        super(props);
+
+        this.dateFormatter = this.dateFormatter.bind(this);
+    }
+
+    dateFormatter(cell) {
+        let dateValue = new Date(cell);
+
+        // Used for making date and time segments two chars long.
+        let leftPad2 = function (val) {
+            return ("00" + val).slice(-2)
+        };
+
+        return dateValue.getFullYear() +
+            '-' + leftPad2(dateValue.getMonth() + 1) +
+            '-' + leftPad2(dateValue.getDate()) +
+            ' ' + leftPad2(dateValue.getHours()) +
+            ':' + leftPad2(dateValue.getMinutes()) +
+            ':' + leftPad2(dateValue.getSeconds());
+    };
+
+    render() {
+        return (
+            <div>
+                <BootstrapTable data={this.props.datasets}
+                                striped={true}
+                                options={{noDataText: 'Indlæser...'}}
+                                bodyStyle={{overflow: 'overlay'}}>
+                    <TableHeaderColumn dataField='name'
+                                       isKey
+                                       dataSort
+                                       width='100'>Navn</TableHeaderColumn>
+                    <TableHeaderColumn dataField='countTotal'
+                                       dataSort
+                                       width='100'>Total</TableHeaderColumn>
+                    <TableHeaderColumn dataField='countActive'
+                                       dataSort
+                                       width='90'>Aktiv</TableHeaderColumn>
+                    <TableHeaderColumn dataField='countDeleted'
+                                       dataSort
+                                       width='90'>Deleted</TableHeaderColumn>
+                    <TableHeaderColumn dataField='modified'
+                                       dataSort
+                                       dataFormat={this.dateFormatter}
+                                       width='160'>Modificeret</TableHeaderColumn>
+                    <TableHeaderColumn dataField='batchId'
+                                       dataSort
+                                       width='90'>Batch id</TableHeaderColumn>
+                </BootstrapTable>
+            </div>
+        )
+    }
+
+}
+
+export default DataSetSummaryList;

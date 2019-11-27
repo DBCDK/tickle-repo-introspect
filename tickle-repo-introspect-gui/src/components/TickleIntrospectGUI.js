@@ -19,7 +19,8 @@ class TickleIntrospectGUI extends React.Component {
         this.state = {
             view: 'overblik',
             instance: '',
-            pid: ''
+            pid: '',
+            record: 'this is a record' //Todo: decide on proper type and content
         };
 
         this.getInstance = this.getInstance.bind(this);
@@ -37,7 +38,7 @@ class TickleIntrospectGUI extends React.Component {
             // List can be empty, hence no default 'datasets' in state
             this.getDatasets();
         }
-        if (this.state.pid === '' ) {
+        if (this.state.pid !== '' ) {
             // Todo: fetch record
         }
 
@@ -126,8 +127,7 @@ class TickleIntrospectGUI extends React.Component {
                                 </label>&nbsp;
                                 <input type="submit" value="Hent post"/>
                             </form>
-                            //todo: add fetch-and-display of xml
-                            xml
+                            <TickleRecordViewer record={this.state.record}/>
                         </Tab>
                     </Tabs>
                 </div>

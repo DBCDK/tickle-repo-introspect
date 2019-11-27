@@ -41,16 +41,16 @@ class DataSetSummaryList extends React.Component {
                                        isKey
                                        dataSort
                                        width='100'>Navn</TableHeaderColumn>
-                    <TableHeaderColumn dataField='countTotal'
+                    <TableHeaderColumn dataField='sum'
                                        dataSort
-                                       width='100'>Total</TableHeaderColumn>
-                    <TableHeaderColumn dataField='countActive'
+                                       width='100'>Sum</TableHeaderColumn>
+                    <TableHeaderColumn dataField='active'
                                        dataSort
-                                       width='90'>Aktiv</TableHeaderColumn>
-                    <TableHeaderColumn dataField='countDeleted'
+                                       width='90'>Aktive</TableHeaderColumn>
+                    <TableHeaderColumn dataField='deleted'
                                        dataSort
-                                       width='90'>Deleted</TableHeaderColumn>
-                    <TableHeaderColumn dataField='modified'
+                                       width='90'>Slettede</TableHeaderColumn>
+                    <TableHeaderColumn dataField='timeOfLastModification'
                                        dataSort
                                        dataFormat={this.dateFormatter}
                                        width='160'>Modificeret</TableHeaderColumn>

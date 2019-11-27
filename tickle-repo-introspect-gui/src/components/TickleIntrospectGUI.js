@@ -16,7 +16,7 @@ class TickleIntrospectGUI extends React.Component {
         super(props);
 
         this.state = {
-            view: 'overview',
+            view: 'overblik',
             instance: ''
         };
 

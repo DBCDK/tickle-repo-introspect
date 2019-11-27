@@ -7,6 +7,11 @@ package dk.dbc.ticklerepo;
 
 import dk.dbc.jsonb.JSONBContext;
 import dk.dbc.jsonb.JSONBException;
+import dk.dbc.marc.binding.MarcRecord;
+import dk.dbc.marc.reader.MarcReaderException;
+import dk.dbc.marc.reader.MarcXchangeV1Reader;
+import dk.dbc.marc.writer.DanMarc2LineFormatWriter;
+import dk.dbc.marc.writer.MarcWriterException;
 import dk.dbc.ticklerepo.dto.DataSet;
 import dk.dbc.ticklerepo.dto.DataSetSummary;
 import dk.dbc.ticklerepo.dto.DataSetSummaryListDTO;
@@ -23,12 +28,26 @@ import javax.inject.Inject;
 import javax.interceptor.Interceptors;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
+import java.io.ByteArrayInputStream;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,7 +56,8 @@ import java.util.Optional;
 @Path("")
 public class TickleRepoIntrospectService {
     private static final Logger LOGGER = LoggerFactory.getLogger(TickleRepoIntrospectService.class);
-    private final JSONBContext mapper = new JSONBContext();
+    private static final JSONBContext mapper = new JSONBContext();
+    private static final DanMarc2LineFormatWriter DANMARC_2_LINE_FORMAT_WRITER = new DanMarc2LineFormatWriter();
 
     @PersistenceContext(unitName = "tickleRepoPU")
     private EntityManager entityManager;
@@ -78,12 +98,21 @@ public class TickleRepoIntrospectService {
     }
 
     @GET
-    @Produces({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.TEXT_PLAIN})
     @Path("v1/record/{pid}")
-    public Response getRecordByPid(@PathParam("pid") String pid) {
+    public Response getRecordByPid(@PathParam("pid") String pid,
+                                   @DefaultValue("LINE") @QueryParam("format") String format) {
         String res;
 
         try {
+            if (!Arrays.asList("LINE", "XML", "RAW").contains(format.toUpperCase())) {
+                final ErrorDTO errorDTO = new ErrorDTO(400, "Bad format param. Must be either LINE, XML or RAW");
+
+                res = mapper.marshall(errorDTO);
+
+                return Response.status(400).entity(res).build();
+            }
+
             if (!pid.contains(":")) {
                 final ErrorDTO errorDTO = new ErrorDTO(400, "Bad Pid format");
 
@@ -126,12 +155,58 @@ public class TickleRepoIntrospectService {
                 return Response.status(400).entity(res).build();
             }
 
-            res = mapper.marshall(record.get());
+            res = recordDataToText(record.get().getContent(), format);
 
-            return Response.ok(res, MediaType.APPLICATION_JSON).build();
+            return Response.ok(res, MediaType.TEXT_PLAIN).build();
         } catch (JSONBException e) {
             LOGGER.error(e.getMessage());
             return Response.serverError().build();
         }
+    }
+
+    private String recordDataToText(byte[] content, String format) {
+        try {
+            if ("LINE".equalsIgnoreCase(format)) {
+
+                final MarcXchangeV1Reader reader = new MarcXchangeV1Reader(new ByteArrayInputStream(content), StandardCharsets.UTF_8);
+
+                final MarcRecord record = reader.read();
+
+                String rawLines = new String(DANMARC_2_LINE_FORMAT_WRITER.write(record, StandardCharsets.UTF_8));
+
+                // Replace all *<single char><value> with <space>*<single char><space><value>. E.g. *aThis is the value -> *a This is the value
+                rawLines = rawLines.replaceAll("(\\*[aA0-zZ9|&])", " $1 ");
+
+                // Replace double space with single space in front of subfield marker
+                rawLines = rawLines.replaceAll(" {2}\\*", " \\*");
+
+                // If the previous line is exactly 82 chars long it will result in an blank line with 4 spaces, so we'll remove that
+                rawLines = rawLines.replaceAll(" {4}\n", "");
+
+                return rawLines;
+            }
+        } catch (MarcWriterException | MarcReaderException e) {
+            LOGGER.info("MarcXChange transform to line failed with error '{}'. Trying as XML instead", e.getMessage());
+        }
+
+        try {
+            if ("XML".equalsIgnoreCase(format)) {
+                final String recordContent = new String(content, StandardCharsets.UTF_8);
+                final Source xmlInput = new StreamSource(new StringReader(recordContent));
+                final StringWriter stringWriter = new StringWriter();
+                final StreamResult xmlOutput = new StreamResult(stringWriter);
+                final TransformerFactory transformerFactory = TransformerFactory.newInstance();
+                transformerFactory.setAttribute("indent-number", 4);
+                final Transformer transformer = transformerFactory.newTransformer();
+                transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+                transformer.transform(xmlInput, xmlOutput);
+
+                return xmlOutput.getWriter().toString();
+            }
+        } catch (TransformerException e) {
+            LOGGER.info("XML transform failed with error '{}'. Returning raw content instead", e.getMessage());
+        }
+
+        return new String(content);
     }
 }

@@ -11,8 +11,6 @@ import queryString from 'query-string'
 
 const request = require('superagent');
 
-const PID_WIDTH = 500;
-
 class TickleIntrospectGUI extends React.Component {
 
     constructor(props) {
@@ -21,14 +19,13 @@ class TickleIntrospectGUI extends React.Component {
         this.state = {
             view: 'overblik',
             instance: '',
-            pid: '',
-            record: ''
+            record: '',
+            recordLoaded: false
         };
 
         this.getInstance = this.getInstance.bind(this);
         this.getDatasets = this.getDatasets.bind(this);
         this.handleTabSelect = this.handleTabSelect.bind(this);
-        this.handlePidChange = this.handlePidChange.bind(this);
     }
 
     componentDidMount() {
@@ -40,10 +37,8 @@ class TickleIntrospectGUI extends React.Component {
             this.getDatasets();
         }
 
-        // Extraxt url parameters
+        // Check for initial tab selection
         const queryParams = queryString.parse(location.search);
-
-        // Initially selected tab: "tab=[overblik|visning]"
         if( queryParams['tab'] !== undefined ) {
             if( ["overblik", "visning"].includes(queryParams['tab']) ) {
                 this.setState({view: queryParams['tab']});
@@ -52,22 +47,10 @@ class TickleIntrospectGUI extends React.Component {
                 location.search = "?tab=overblik";
             }
         }
-
-        // Pid for lookup in tab 'visning'
-        if( queryParams["pid"] !== undefined ) {
-            this.setState({pid: queryParams["pid"]});
-            console.log("lookup " + queryParams["pid"]);
-            this.getRecordFromPid(queryParams["pid"]);
-        }
     }
 
     handleTabSelect(view) {
         this.setState({view: view});
-    }
-
-    handlePidChange(event) {
-        this.setState({pid: event.target.value});
-        this.getRecordFromPid(event.target.value);
     }
 
     getInstance() {
@@ -101,27 +84,6 @@ class TickleIntrospectGUI extends React.Component {
             });
     }
 
-    getRecordFromPid(pid) {
-        let parts = pid.split(":");
-        if( parts.length == 2 && parts[0].length > 0 && parts[1].length > 0 ) {
-            request
-                .get('/api/v1/record/' + pid)
-                .set('Content-Type', 'text/plain')
-                .then(res => {
-                    if( !res.ok ) {
-                        throw new Error(res.status);
-                    }
-                    this.setState({record: res.text});
-                })
-                .catch(err => {
-                    if( err.status == 400 ) {
-                        this.setState({record: ''});
-                    } else {
-                        alert(err.message);
-                    }
-                });
-        }
-    }
 
     render() {
         return (
@@ -138,16 +100,7 @@ class TickleIntrospectGUI extends React.Component {
                             <DataSetSummaryList datasets={this.state.datasets}/>
                         </Tab>
                         <Tab eventKey={'visning'} title="Visning" style={{margin: '10px'}}>
-                            <form onSubmit={this.handlePidSubmit}>
-                                <label>
-                                    Pid:
-                                    <input type="text"
-                                           value={this.state.pid}
-                                           onChange={this.handlePidChange}
-                                           style={{width: PID_WIDTH + 'px'}}/>
-                                </label>&nbsp;
-                            </form>
-                            <TickleRecordViewer record={this.state.record}/>
+                            <TickleRecordViewer/>
                         </Tab>
                     </Tabs>
                 </div>

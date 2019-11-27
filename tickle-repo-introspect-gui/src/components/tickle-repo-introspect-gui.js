@@ -5,8 +5,8 @@
 
 import React from "react";
 import {Tab, Tabs} from "react-bootstrap";
-import DataSetSummaryList from "./DataSetSummaryList";
-import TickleRecordViewer from "./TickleRecordViewer";
+import DataSetSummaryList from "./tickle-repo-dataset-summary-list";
+import TickleRecordViewer from "./tickle-repo-record-viewer";
 import queryString from 'query-string'
 
 const request = require('superagent');

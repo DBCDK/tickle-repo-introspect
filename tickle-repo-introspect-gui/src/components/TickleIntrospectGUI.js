@@ -6,6 +6,7 @@
 import React from "react";
 import {Tab, Tabs} from "react-bootstrap";
 import DataSetSummaryList from "./DataSetSummaryList";
+import TickleRecordViewer from "./TickleRecordViewer";
 import queryString from 'query-string'
 
 const request = require('superagent');
@@ -17,12 +18,15 @@ class TickleIntrospectGUI extends React.Component {
 
         this.state = {
             view: 'overblik',
-            instance: ''
+            instance: '',
+            pid: ''
         };
 
         this.getInstance = this.getInstance.bind(this);
         this.getDatasets = this.getDatasets.bind(this);
-        this.handleSelect = this.handleSelect.bind(this);
+        this.handleTabSelect = this.handleTabSelect.bind(this);
+        this.handlePidChange = this.handlePidChange.bind(this);
+        this.handlePidSubmit = this.handlePidSubmit.bind(this);
     }
 
     componentDidMount() {
@@ -32,6 +36,9 @@ class TickleIntrospectGUI extends React.Component {
         if (this.state.datasets === undefined) {
             // List can be empty, hence no default 'datasets' in state
             this.getDatasets();
+        }
+        if (this.state.pid === '' ) {
+            // Todo: fetch record
         }
 
         // Extraxt url parameters
@@ -53,8 +60,17 @@ class TickleIntrospectGUI extends React.Component {
         }
     }
 
-    handleSelect(view) {
+    handleTabSelect(view) {
         this.setState({view: view});
+    }
+
+    handlePidChange(event) {
+        this.setState({pid: event.target.value});
+    }
+
+    handlePidSubmit(event) {
+        console.log('A pid was submitted: ' + this.state.pid);
+        event.preventDefault();
     }
 
     getInstance() {
@@ -97,15 +113,19 @@ class TickleIntrospectGUI extends React.Component {
                 </div>
                 <div>
                     <Tabs activeKey={this.state.view}
-                          onSelect={this.handleSelect}
+                          onSelect={this.handleTabSelect}
                           animation={false}
                           id="tabs">
-                        <Tab eventKey={'overblik'} title="Overblik">
+                        <Tab eventKey={'overblik'} title="Overblik" style={{margin: '10px'}}>
                             <DataSetSummaryList datasets={this.state.datasets}/>
                         </Tab>
-                        <Tab eventKey={'visning'} title="Visning">
-                            //todo: add input for pid
-                            pid: {this.state.pid}
+                        <Tab eventKey={'visning'} title="Visning" style={{margin: '10px'}}>
+                            <form onSubmit={this.handlePidSubmit}>
+                                <label>
+                                    Pid: <input type="text" value={this.state.pid} onChange={this.handlePidChange} />
+                                </label>&nbsp;
+                                <input type="submit" value="Hent post"/>
+                            </form>
                             //todo: add fetch-and-display of xml
                             xml
                         </Tab>

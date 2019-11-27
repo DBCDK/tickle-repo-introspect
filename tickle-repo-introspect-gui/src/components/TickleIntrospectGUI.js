@@ -11,6 +11,8 @@ import queryString from 'query-string'
 
 const request = require('superagent');
 
+const PID_WIDTH = 500;
+
 class TickleIntrospectGUI extends React.Component {
 
     constructor(props) {
@@ -27,7 +29,6 @@ class TickleIntrospectGUI extends React.Component {
         this.getDatasets = this.getDatasets.bind(this);
         this.handleTabSelect = this.handleTabSelect.bind(this);
         this.handlePidChange = this.handlePidChange.bind(this);
-        this.handlePidSubmit = this.handlePidSubmit.bind(this);
     }
 
     componentDidMount() {
@@ -37,9 +38,6 @@ class TickleIntrospectGUI extends React.Component {
         if (this.state.datasets === undefined) {
             // List can be empty, hence no default 'datasets' in state
             this.getDatasets();
-        }
-        if (this.state.pid !== '' ) {
-            this.getRecordFromPid(this.state.pid);
         }
 
         // Extraxt url parameters
@@ -58,7 +56,8 @@ class TickleIntrospectGUI extends React.Component {
         // Pid for lookup in tab 'visning'
         if( queryParams["pid"] !== undefined ) {
             this.setState({pid: queryParams["pid"]});
-            this.getRecordFromPid(this.state.pid);
+            console.log("lookup " + queryParams["pid"]);
+            this.getRecordFromPid(queryParams["pid"]);
         }
     }
 
@@ -68,11 +67,7 @@ class TickleIntrospectGUI extends React.Component {
 
     handlePidChange(event) {
         this.setState({pid: event.target.value});
-    }
-
-    handlePidSubmit(event) {
-        this.getRecordFromPid(this.state.pid)
-        event.preventDefault();
+        this.getRecordFromPid(event.target.value);
     }
 
     getInstance() {
@@ -107,24 +102,28 @@ class TickleIntrospectGUI extends React.Component {
     }
 
     getRecordFromPid(pid) {
-
-        // Only request a record if we have a valid localid and dataset
         let parts = pid.split(":");
         if( parts.length == 2 && parts[0].length > 0 && parts[1].length > 0 ) {
             request
                 .get('/api/v1/record/' + pid)
-                .set('Accepts', 'application/json')
+                .set('Content-Type', 'text/plain')
                 .then(res => {
+                    if( !res.ok ) {
+                        throw new Error(res.status);
+                    }
                     this.setState({record: res.text});
                 })
                 .catch(err => {
-                    alert(err.message);
+                    if( err.status == 400 ) {
+                        this.setState({record: ''});
+                    } else {
+                        alert(err.message);
+                    }
                 });
         }
     }
 
     render() {
-
         return (
             <div style={{width: '100%', overflow: 'hidden'}}>
                 <div>
@@ -141,9 +140,12 @@ class TickleIntrospectGUI extends React.Component {
                         <Tab eventKey={'visning'} title="Visning" style={{margin: '10px'}}>
                             <form onSubmit={this.handlePidSubmit}>
                                 <label>
-                                    Pid: <input type="text" value={this.state.pid} onChange={this.handlePidChange} />
+                                    Pid:
+                                    <input type="text"
+                                           value={this.state.pid}
+                                           onChange={this.handlePidChange}
+                                           style={{width: PID_WIDTH + 'px'}}/>
                                 </label>&nbsp;
-                                <input type="submit" value="Hent post"/>
                             </form>
                             <TickleRecordViewer record={this.state.record}/>
                         </Tab>

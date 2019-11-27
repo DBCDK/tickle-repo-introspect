@@ -108,11 +108,18 @@ class TickleIntrospectGUI extends React.Component {
 
     getRecordFromPid(pid) {
 
+        // Only request a record if we have a valid localid and dataset
         let parts = pid.split(":");
-        if( parts.length == 2 ) {
-            console.log("Looking up tickle record for localid " + parts[0] + " and dataset " + parts[1]);
-            // Todo: add backend request
-            this.setState({record: '<ticklerecord><field><subfield name="a" value="b"></subfield><subfield name="a" value="b"/></field></ticklerecord>'});
+        if( parts.length == 2 && parts[0].length > 0 && parts[1].length > 0 ) {
+            request
+                .get('/api/v1/record/' + pid)
+                .set('Accepts', 'application/json')
+                .then(res => {
+                    this.setState({record: res.text});
+                })
+                .catch(err => {
+                    alert(err.message);
+                });
         }
     }
 

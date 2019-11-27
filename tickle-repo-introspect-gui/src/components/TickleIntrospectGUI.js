@@ -34,14 +34,22 @@ class TickleIntrospectGUI extends React.Component {
             this.getDatasets();
         }
 
+        // Extraxt url parameters
         const queryParams = queryString.parse(location.search);
+
+        // Initially selected tab: "tab=[overblik|visning]"
         if( queryParams['tab'] !== undefined ) {
-            if( ["overblik"].includes(queryParams['tab']) ) {
+            if( ["overblik", "visning"].includes(queryParams['tab']) ) {
                 this.setState({view: queryParams['tab']});
             } else {
                 // Redirect to a sane tab id
                 location.search = "?tab=overblik";
             }
+        }
+
+        // Pid for lookup in tab 'visning'
+        if( queryParams["pid"] !== undefined ) {
+            this.setState({pid: queryParams["pid"]});
         }
     }
 
@@ -94,6 +102,12 @@ class TickleIntrospectGUI extends React.Component {
                           id="tabs">
                         <Tab eventKey={'overblik'} title="Overblik">
                             <DataSetSummaryList datasets={this.state.datasets}/>
+                        </Tab>
+                        <Tab eventKey={'visning'} title="Visning">
+                            //todo: add input for pid
+                            pid: {this.state.pid}
+                            //todo: add fetch-and-display of xml
+                            xml
                         </Tab>
                     </Tabs>
                 </div>

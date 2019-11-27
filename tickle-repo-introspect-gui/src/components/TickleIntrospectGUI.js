@@ -20,7 +20,7 @@ class TickleIntrospectGUI extends React.Component {
             view: 'overblik',
             instance: '',
             pid: '',
-            record: 'this is a record' //Todo: decide on proper type and content
+            record: ''
         };
 
         this.getInstance = this.getInstance.bind(this);
@@ -39,7 +39,7 @@ class TickleIntrospectGUI extends React.Component {
             this.getDatasets();
         }
         if (this.state.pid !== '' ) {
-            // Todo: fetch record
+            this.getRecordFromPid(this.state.pid);
         }
 
         // Extraxt url parameters
@@ -58,6 +58,7 @@ class TickleIntrospectGUI extends React.Component {
         // Pid for lookup in tab 'visning'
         if( queryParams["pid"] !== undefined ) {
             this.setState({pid: queryParams["pid"]});
+            this.getRecordFromPid(this.state.pid);
         }
     }
 
@@ -70,7 +71,7 @@ class TickleIntrospectGUI extends React.Component {
     }
 
     handlePidSubmit(event) {
-        console.log('A pid was submitted: ' + this.state.pid);
+        this.getRecordFromPid(this.state.pid)
         event.preventDefault();
     }
 
@@ -103,6 +104,16 @@ class TickleIntrospectGUI extends React.Component {
             .catch(err => {
                 alert(err.message);
             });
+    }
+
+    getRecordFromPid(pid) {
+
+        let parts = pid.split(":");
+        if( parts.length == 2 ) {
+            console.log("Looking up tickle record for localid " + parts[0] + " and dataset " + parts[1]);
+            // Todo: add backend request
+            this.setState({record: '<ticklerecord><field><subfield name="a" value="b"></subfield><subfield name="a" value="b"/></field></ticklerecord>'});
+        }
     }
 
     render() {

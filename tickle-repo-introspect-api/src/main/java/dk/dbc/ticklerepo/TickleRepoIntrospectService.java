@@ -5,8 +5,6 @@
 
 package dk.dbc.ticklerepo;
 
-import dk.dbc.jsonb.JSONBContext;
-import dk.dbc.jsonb.JSONBException;
 import dk.dbc.marc.binding.ControlField;
 import dk.dbc.marc.binding.Field;
 import dk.dbc.marc.binding.MarcRecord;

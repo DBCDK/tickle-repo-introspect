@@ -53,7 +53,7 @@ class DataSetSummaryList extends React.Component {
                                        width='90'>Slettede</TableHeaderColumn>
                     <TableHeaderColumn dataField='reset'
                                        dataSort
-                                       width='90'>Omkørsel</TableHeaderColumn>
+                                       width='90'>Under omkørsel</TableHeaderColumn>
                     <TableHeaderColumn dataField='timeOfLastModification'
                                        dataSort
                                        dataFormat={this.dateFormatter}

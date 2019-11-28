@@ -70,6 +70,7 @@ class TickleRepoIntrospectGUI extends React.Component {
             format: "best"
         });
         this.getRecordFromRecordId(event.target.value, "best");
+        this.setState({view: "visning"});
     }
 
     handleChangeFormat(event) {

@@ -9,7 +9,7 @@ import RawrepoIntrospectRecordCopy from './tickle-repo-introspect-record-copy';
 import queryString from "query-string";
 
 const HEIGHT_OFFSET = 210;
-const PID_WIDTH = 500;
+const RECORDPID_WIDTH = 500;
 
 const request = require('superagent');
 
@@ -22,12 +22,12 @@ class TickleRecordViewer extends React.Component {
             textareaHeight: window.innerHeight - HEIGHT_OFFSET,
             record: '',
             recordLoaded: false,
-            pid: ''
+            recordPid: ''
         };
 
         this.updateDimensions = this.updateDimensions.bind(this);
-        this.handlePidChange = this.handlePidChange.bind(this);
-        this.getRecordFromPid = this.getRecordFromPid.bind(this);
+        this.handleRecordPidChange = this.handleRecordPidChange.bind(this);
+        this.getRecordFromRecordPid = this.getRecordFromRecordPid.bind(this);
     }
 
     updateDimensions() {
@@ -44,9 +44,9 @@ class TickleRecordViewer extends React.Component {
         window.addEventListener("resize", this.updateDimensions);
 
         const queryParams = queryString.parse(location.search);
-        if( queryParams["pid"] !== undefined ) {
-            this.setState({pid: queryParams["pid"]});
-            this.getRecordFromPid(queryParams["pid"]);
+        if( queryParams["recordPid"] !== undefined ) {
+            this.setState({recordPid: queryParams["recordPid"]});
+            this.getRecordFromRecordPid(queryParams["recordPid"]);
         }
     };
 
@@ -54,16 +54,16 @@ class TickleRecordViewer extends React.Component {
         window.removeEventListener("resize", this.updateDimensions);
     }
 
-    handlePidChange(event) {
-        this.setState({pid: event.target.value});
-        this.getRecordFromPid(event.target.value);
+    handleRecordPidChange(event) {
+        this.setState({recordPid: event.target.value});
+        this.getRecordFromRecordPid(event.target.value);
     }
 
-    getRecordFromPid(pid) {
-        let parts = pid.split(":");
+    getRecordFromRecordPid(recordPid) {
+        let parts = recordPid.split(":");
         if( parts.length == 2 && parts[0].length > 0 && parts[1].length > 0 ) {
             request
-                .get('/api/v1/record/' + pid)
+                .get('/api/v1/record/' + recordPid)
                 .set('Content-Type', 'text/plain')
                 .then(res => {
                     if( !res.ok ) {
@@ -93,13 +93,13 @@ class TickleRecordViewer extends React.Component {
             <div>
                 <div style={{width: '100%', overflow: 'hidden'}}>
                     <div className='form-group' style={{height: '28px'}}>
-                        <label className={'pid-label'}
+                        <label className={'recordpid-label'}
                                style={{marginLeft: '5px', marginRight: '20px', float: 'left'}}>
-                            Pid&nbsp;
+                            RecordPid&nbsp;
                             <input type="text"
-                                   value={this.state.pid}
+                                   value={this.state.recordPid}
                                    onChange={this.handlePidChange}
-                                   style={{width: PID_WIDTH + 'px'}}/>
+                                   style={{width: RECORDPID_WIDTH + 'px'}}/>
                         </label>
                         <label
                             className='control-label'

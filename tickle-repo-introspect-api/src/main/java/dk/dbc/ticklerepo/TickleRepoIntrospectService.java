@@ -7,10 +7,13 @@ package dk.dbc.ticklerepo;
 
 import dk.dbc.jsonb.JSONBContext;
 import dk.dbc.jsonb.JSONBException;
+import dk.dbc.marc.binding.ControlField;
+import dk.dbc.marc.binding.Field;
 import dk.dbc.marc.binding.MarcRecord;
 import dk.dbc.marc.reader.MarcReaderException;
 import dk.dbc.marc.reader.MarcXchangeV1Reader;
 import dk.dbc.marc.writer.DanMarc2LineFormatWriter;
+import dk.dbc.marc.writer.LineFormatWriter;
 import dk.dbc.marc.writer.MarcWriterException;
 import dk.dbc.ticklerepo.dto.DataSet;
 import dk.dbc.ticklerepo.dto.DataSetSummary;
@@ -58,6 +61,7 @@ public class TickleRepoIntrospectService {
     private static final Logger LOGGER = LoggerFactory.getLogger(TickleRepoIntrospectService.class);
     private static final JSONBContext mapper = new JSONBContext();
     private static final DanMarc2LineFormatWriter DANMARC_2_LINE_FORMAT_WRITER = new DanMarc2LineFormatWriter();
+    private static final LineFormatWriter LINE_FORMAT_WRITER = new LineFormatWriter();
 
     @PersistenceContext(unitName = "tickleRepoPU")
     private EntityManager entityManager;
@@ -99,8 +103,8 @@ public class TickleRepoIntrospectService {
 
     @GET
     @Produces({MediaType.TEXT_PLAIN})
-    @Path("v1/record/{pid}")
-    public Response getRecordByPid(@PathParam("pid") String pid,
+    @Path("v1/record/{recordId}")
+    public Response getRecordByRecordId(@PathParam("recordId") String recordId,
                                    @DefaultValue("LINE") @QueryParam("format") String format) {
         String res;
 
@@ -113,23 +117,26 @@ public class TickleRepoIntrospectService {
                 return Response.status(400).entity(res).build();
             }
 
-            if (!pid.contains(":")) {
-                final ErrorDTO errorDTO = new ErrorDTO(400, "Bad Pid format");
+            // recordId is of the format <dataset name>:<record localid>
+            // Examples:
+            // 125320-m21:00003196
+            // 150024-bibvagt:002da116-5827-a6e4-fd70-d85bbb97c099
+            if (!recordId.contains(":")) {
+                final ErrorDTO errorDTO = new ErrorDTO(400, "Bad record id format");
 
                 res = mapper.marshall(errorDTO);
 
                 return Response.status(400).entity(res).build();
             }
 
-            final String[] values = pid.split(":");
+            final String[] values = recordId.split(":");
             final String dataSetName = values[0];
             final String localId = values[1];
 
-            // More pid validation here?
+            // More record id validation here?
 
             final DataSet lookupDataSet = new DataSet()
                     .withName(dataSetName);
-
             final Optional<DataSet> dataSet = tickleRepo.lookupDataSet(lookupDataSet);
 
             if (!dataSet.isPresent()) {
@@ -143,8 +150,6 @@ public class TickleRepoIntrospectService {
             final Record lookupRecord = new Record()
                     .withLocalId(localId)
                     .withDataset(dataSet.get().getId());
-
-
             final Optional<Record> record = tickleRepo.lookupRecord(lookupRecord);
 
             if (!record.isPresent()) {
@@ -167,18 +172,28 @@ public class TickleRepoIntrospectService {
     private String recordDataToText(byte[] content, String format) {
         try {
             if ("LINE".equalsIgnoreCase(format)) {
-
                 final MarcXchangeV1Reader reader = new MarcXchangeV1Reader(new ByteArrayInputStream(content), StandardCharsets.UTF_8);
-
                 final MarcRecord record = reader.read();
 
-                String rawLines = new String(DANMARC_2_LINE_FORMAT_WRITER.write(record, StandardCharsets.UTF_8));
+                String rawLines = "";
 
-                // Replace all *<single char><value> with <space>*<single char><space><value>. E.g. *aThis is the value -> *a This is the value
-                rawLines = rawLines.replaceAll("(\\*[aA0-zZ9|&])", " $1 ");
+                Field field001 = record.getField(MarcRecord.hasTag("001")).get(); // All record formats should have field 001
+                // Check if the record is marc21. If so use generic line format writer.
+                // If not marc21 then Danmarc2 format is assumed and specific line format writer used
+                if (field001 instanceof ControlField) {
+                    rawLines = new String(LINE_FORMAT_WRITER.write(record, StandardCharsets.UTF_8));
 
-                // Replace double space with single space in front of subfield marker
-                rawLines = rawLines.replaceAll(" {2}\\*", " \\*");
+                    // Replace all $<single char><value> with <space>$<single char><space><value>. E.g. $aThis is the value -> $a This is the value
+                    rawLines = rawLines.replaceAll("(\\$[aA0-zZ9|&])", " $1 ");
+                } else {
+                    rawLines = new String(DANMARC_2_LINE_FORMAT_WRITER.write(record, StandardCharsets.UTF_8));
+
+                    // Replace all *<single char><value> with <space>*<single char><space><value>. E.g. *aThis is the value -> *a This is the value
+                    rawLines = rawLines.replaceAll("(\\*[aA0-zZ9|&])", " $1 ");
+
+                    // Replace double space with single space in front of subfield marker
+                    rawLines = rawLines.replaceAll(" {2}\\*", " \\*");
+                }
 
                 // If the previous line is exactly 82 chars long it will result in an blank line with 4 spaces, so we'll remove that
                 rawLines = rawLines.replaceAll(" {4}\n", "");
@@ -186,11 +201,14 @@ public class TickleRepoIntrospectService {
                 return rawLines;
             }
         } catch (MarcWriterException | MarcReaderException e) {
+            // We don't really care about this exception to just log it as info
             LOGGER.info("MarcXChange transform to line failed with error '{}'. Trying as XML instead", e.getMessage());
         }
 
         try {
-            if ("XML".equalsIgnoreCase(format)) {
+            // If we reach this point it is either because the format is XML or because LINE conversion failed
+            // If LINE conversion failed we want to try with XML conversion in stead
+            if ("XML".equalsIgnoreCase(format) || "LINE".equalsIgnoreCase(format)) {
                 final String recordContent = new String(content, StandardCharsets.UTF_8);
                 final Source xmlInput = new StreamSource(new StringReader(recordContent));
                 final StringWriter stringWriter = new StringWriter();
@@ -204,9 +222,11 @@ public class TickleRepoIntrospectService {
                 return xmlOutput.getWriter().toString();
             }
         } catch (TransformerException e) {
+            // We don't really care about this exception to just log it as info
             LOGGER.info("XML transform failed with error '{}'. Returning raw content instead", e.getMessage());
         }
 
+        // Converting to LINE or XML failed to just return the raw content
         return new String(content);
     }
 }

@@ -52,12 +52,7 @@ class TickleRepoIntrospectRecordViewer extends React.Component {
             <div>
                 <div style={{width: '100%', overflow: 'hidden'}}>
                     <div className='form-group' style={{height: '28px'}}>
-
-                        <label
-                            className='control-label'
-                            style={{marginTop: '5px', float: 'left'}}
-                            htmlFor='record-format-selector'>Visningsformat</label>
-                        <div style={{marginLeft: '10px', float: 'left'}}>
+                        <div style={{float: 'left'}}>
                             <RawrepoIntrospectRecordFormatSelector
                                 id='record-format-selector'
                                 format={this.props.format}

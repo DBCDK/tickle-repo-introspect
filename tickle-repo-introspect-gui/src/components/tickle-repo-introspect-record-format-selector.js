@@ -21,7 +21,6 @@ class TickleRepoIntrospectRecordFormatSelector extends React.Component {
                     <ButtonGroup id='button-tool-bar-format'>
                         <Button onClick={this.props.handleChangeFormat}
                                 bsStyle={format === 'best' ? 'primary' : 'default'}
-                                style={{marginRight: '10px'}}
                                 id='button-format-best'
                                 value='best'
                                 disabled={!this.props.recordLoaded}>Bedste</Button>

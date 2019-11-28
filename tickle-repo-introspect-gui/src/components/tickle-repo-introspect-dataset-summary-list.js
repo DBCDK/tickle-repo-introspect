@@ -15,7 +15,8 @@ class DataSetSummaryList extends React.Component {
     }
 
     dateFormatter(cell) {
-        let dateValue = new Date(cell);
+        // Todo: temporary fix to get dates to parse. Will most likely be fixed in the API
+        let dateValue = new Date(cell.toString().replace("[UTC]",""));
 
         // Used for making date and time segments two chars long.
         let leftPad2 = function (val) {

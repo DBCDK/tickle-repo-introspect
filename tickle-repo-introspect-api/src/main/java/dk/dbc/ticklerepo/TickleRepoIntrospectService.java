@@ -183,7 +183,7 @@ public class TickleRepoIntrospectService {
 
                 return rawLines;
             }
-        } catch (MarcWriterException | MarcReaderException e) {
+        } catch (MarcWriterException | MarcReaderException | NullPointerException e) {
             // We don't really care about this exception to just log it as info
             LOGGER.info("MarcXChange transform to line failed with error '{}'. Trying as XML instead", e.getMessage());
         }

@@ -5,7 +5,6 @@
 
 import React from "react";
 import RawrepoIntrospectRecordFormatSelector from './tickle-repo-introspect-record-format-selector';
-import queryString from "query-string";
 
 const HEIGHT_OFFSET = 190;
 const LINE_HEIGHT = 22;
@@ -63,12 +62,14 @@ class TickleRepoIntrospectRecordViewer extends React.Component {
                                 id='record-format-selector'
                                 format={this.props.format}
                                 handleChangeFormat={this.props.handleChangeFormat}
-                                recordLoaded={this.props.recordLoaded}/>
+                                recordLoaded={this.props.recordLoaded}
+                                showBlanks={this.props.showBlanks}
+                                handleShowBlanksChecked={this.props.handleShowBlanksChecked}/>
                         </div>
                     </div>
                 </div>
                 <div className="flex-container">
-                    <textarea value={this.props.record}
+                    <textarea value={ this.props.showBlanks && this.props.format == 'LINE' ? this.props.record.replace(/ /g, "_") : this.props.record }
                               readOnly={true}
                               style={{
                                   width: '100%',
@@ -80,7 +81,8 @@ class TickleRepoIntrospectRecordViewer extends React.Component {
                                   backgroundColor: '#ffffff',
                                   color: this.props.textColor,
                                   border: 'solid 1px #aaaaaa',
-                                  whiteSpace: 'pre'
+                                  whiteSpace: 'pre',
+                                  letterSpacing: this.props.showBlanks && this.props.format == 'LINE' ? '2px' : '0px'
                               }}
                               rows={this.state.textareaCols}
                     />

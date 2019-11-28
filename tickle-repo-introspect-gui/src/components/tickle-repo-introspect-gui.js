@@ -23,7 +23,8 @@ class TickleRepoIntrospectGUI extends React.Component {
             record: '',
             recordLoaded: false,
             recordId: '',
-            format: 'best'
+            format: 'best',
+            showBlanks: false
         };
 
         this.getInstance = this.getInstance.bind(this);
@@ -33,6 +34,7 @@ class TickleRepoIntrospectGUI extends React.Component {
         this.handleTabSelect = this.handleTabSelect.bind(this);
         this.handleRecordIdChange = this.handleRecordIdChange.bind(this);
         this.handleChangeFormat = this.handleChangeFormat.bind(this);
+        this.handleShowBlanksChecked = this.handleShowBlanksChecked.bind(this);
     }
 
     componentDidMount() {
@@ -89,6 +91,10 @@ class TickleRepoIntrospectGUI extends React.Component {
         this.setState({format: format});
         this.getRecordFromRecordId(this.state.recordId, format);
         this.redirectToUrlWithParams(this.state.view, format, this.state.recordId);
+    }
+
+    handleShowBlanksChecked(event) {
+        this.setState({showBlanks: !this.state.showBlanks});
     }
 
     getInstance() {
@@ -179,7 +185,9 @@ class TickleRepoIntrospectGUI extends React.Component {
                                                 recordLoaded={this.state.recordLoaded}
                                                 format={this.state.format}
                                                 handleChangeFormat={this.handleChangeFormat}
-                                                textColor='#000000'/>
+                                                textColor='#000000'
+                                                showBlanks={this.state.showBlanks}
+                                                handleShowBlanksChecked={this.handleShowBlanksChecked}/>
                         </Tab>
                     </Tabs>
                 </div>

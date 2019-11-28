@@ -4,7 +4,7 @@
  */
 
 import React from "react";
-import {Button, ButtonGroup} from "react-bootstrap";
+import {Button, ButtonGroup, ToggleButtonGroup, ToggleButton} from "react-bootstrap";
 
 class TickleRepoIntrospectRecordFormatSelector extends React.Component {
 
@@ -36,6 +36,18 @@ class TickleRepoIntrospectRecordFormatSelector extends React.Component {
                                 value='XML'
                                 disabled={!this.props.recordLoaded}>XML</Button>
                     </ButtonGroup>
+                    {
+                        format == 'LINE' ?
+                        <ToggleButtonGroup type="checkbox"
+                                           onChange={this.props.handleShowBlanksChecked}
+                                           style={{marginLeft: '30px'}}>
+                            <ToggleButton value={'blanke'}
+                                          bsStyle={this.props.showBlanks ? 'success' : 'default'}>
+                                Vis blanktegn
+                            </ToggleButton>
+                        </ToggleButtonGroup>
+                        : ''
+                    }
                 </div>
             </div>
         )

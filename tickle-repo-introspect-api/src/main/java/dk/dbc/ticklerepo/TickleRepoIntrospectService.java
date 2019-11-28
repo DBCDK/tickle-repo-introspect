@@ -56,10 +56,9 @@ import java.util.Optional;
 
 @Interceptors(StopwatchInterceptor.class)
 @Stateless
-@Path("")
+@Path("v1")
 public class TickleRepoIntrospectService {
     private static final Logger LOGGER = LoggerFactory.getLogger(TickleRepoIntrospectService.class);
-    private static final JSONBContext mapper = new JSONBContext();
     private static final DanMarc2LineFormatWriter DANMARC_2_LINE_FORMAT_WRITER = new DanMarc2LineFormatWriter();
     private static final LineFormatWriter LINE_FORMAT_WRITER = new LineFormatWriter();
 
@@ -75,98 +74,84 @@ public class TickleRepoIntrospectService {
 
     @GET
     @Produces({MediaType.TEXT_PLAIN})
-    @Path("v1/instance")
+    @Path("instance")
     public Response getConfig() {
         return Response.ok(INSTANCE).build();
     }
 
     @GET
     @Produces({MediaType.APPLICATION_JSON})
-    @Path("v1/datasets")
+    @Path("datasets")
     public Response getDataSetSummary() {
-        String res;
+        final List<DataSetSummary> dataSets = tickleRepo.getDataSetSummary();
+        final DataSetSummaryListDTO list = new DataSetSummaryListDTO();
 
-        try {
-            final List<DataSetSummary> dataSets = tickleRepo.getDataSetSummary();
-            final DataSetSummaryListDTO list = new DataSetSummaryListDTO();
+        list.setDataSets(dataSets);
 
-            list.setDataSets(dataSets);
-
-            res = mapper.marshall(list);
-
-            return Response.ok(res, MediaType.APPLICATION_JSON).build();
-        } catch (JSONBException e) {
-            LOGGER.error(e.getMessage());
-            return Response.serverError().build();
-        }
+        return Response.ok(list, MediaType.APPLICATION_JSON).build();
     }
 
     @GET
     @Produces({MediaType.TEXT_PLAIN})
-    @Path("v1/record/{recordId}")
+    @Path("records/{recordId}")
     public Response getRecordByRecordId(@PathParam("recordId") String recordId,
-                                   @DefaultValue("LINE") @QueryParam("format") String format) {
+                                        @DefaultValue("LINE") @QueryParam("format") String format) {
         String res;
 
-        try {
-            if (!Arrays.asList("LINE", "XML", "RAW").contains(format.toUpperCase())) {
-                final ErrorDTO errorDTO = new ErrorDTO(400, "Bad format param. Must be either LINE, XML or RAW");
-
-                res = mapper.marshall(errorDTO);
-
-                return Response.status(400).entity(res).build();
-            }
-
-            // recordId is of the format <dataset name>:<record localid>
-            // Examples:
-            // 125320-m21:00003196
-            // 150024-bibvagt:002da116-5827-a6e4-fd70-d85bbb97c099
-            if (!recordId.contains(":")) {
-                final ErrorDTO errorDTO = new ErrorDTO(400, "Bad record id format");
-
-                res = mapper.marshall(errorDTO);
-
-                return Response.status(400).entity(res).build();
-            }
-
-            final String[] values = recordId.split(":");
-            final String dataSetName = values[0];
-            final String localId = values[1];
-
-            // More record id validation here?
-
-            final DataSet lookupDataSet = new DataSet()
-                    .withName(dataSetName);
-            final Optional<DataSet> dataSet = tickleRepo.lookupDataSet(lookupDataSet);
-
-            if (!dataSet.isPresent()) {
-                final ErrorDTO errorDTO = new ErrorDTO(400, "No dataset found with name '" + dataSetName + "'");
-
-                res = mapper.marshall(errorDTO);
-
-                return Response.status(400).entity(res).build();
-            }
-
-            final Record lookupRecord = new Record()
-                    .withLocalId(localId)
-                    .withDataset(dataSet.get().getId());
-            final Optional<Record> record = tickleRepo.lookupRecord(lookupRecord);
-
-            if (!record.isPresent()) {
-                final ErrorDTO errorDTO = new ErrorDTO(400, "No record found with local id '" + localId + "' and dataset name '" + dataSetName + "'");
-
-                res = mapper.marshall(errorDTO);
-
-                return Response.status(400).entity(res).build();
-            }
-
-            res = recordDataToText(record.get().getContent(), format);
-
-            return Response.ok(res, MediaType.TEXT_PLAIN).build();
-        } catch (JSONBException e) {
-            LOGGER.error(e.getMessage());
-            return Response.serverError().build();
+        if (!Arrays.asList("LINE", "XML", "RAW").contains(format.toUpperCase())) {
+            return Response
+                    .status(400)
+                    .entity(new ErrorDTO(400, "Bad format param. Must be either LINE, XML or RAW"))
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
         }
+
+        // recordId is of the format <dataset name>:<record localid>
+        // Examples:
+        // 125320-m21:00003196
+        // 150024-bibvagt:002da116-5827-a6e4-fd70-d85bbb97c099
+        if (!recordId.contains(":")) {
+            return Response
+                    .status(400)
+                    .entity(new ErrorDTO(400, "Bad record id format"))
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+        final String[] values = recordId.split(":");
+        final String dataSetName = values[0];
+        final String localId = values[1];
+
+        // More record id validation here?
+
+        final DataSet lookupDataSet = new DataSet()
+                .withName(dataSetName);
+        final Optional<DataSet> dataSet = tickleRepo.lookupDataSet(lookupDataSet);
+
+        if (!dataSet.isPresent()) {
+            return Response
+                    .status(400)
+                    .entity(new ErrorDTO(400, "No dataset found with name '" + dataSetName + "'"))
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+        final Record lookupRecord = new Record()
+                .withLocalId(localId)
+                .withDataset(dataSet.get().getId());
+        final Optional<Record> record = tickleRepo.lookupRecord(lookupRecord);
+
+        if (!record.isPresent()) {
+            return Response
+                    .status(400)
+                    .entity(new ErrorDTO(400, "No record found with local id '" + localId + "' and dataset name '" + dataSetName + "'"))
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+        res = recordDataToText(record.get().getContent(), format);
+
+        return Response.ok(res, MediaType.TEXT_PLAIN).build();
     }
 
     private String recordDataToText(byte[] content, String format) {

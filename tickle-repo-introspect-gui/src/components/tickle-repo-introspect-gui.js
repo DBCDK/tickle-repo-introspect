@@ -46,22 +46,32 @@ class TickleRepoIntrospectGUI extends React.Component {
 
         // Check for initial values from the querystring
         const queryParams = queryString.parse(location.search);
-        if( queryParams['tab'] !== undefined ) {
-            if( ["overblik", "visning"].includes(queryParams['tab']) ) {
-                this.setState({view: queryParams['tab']});
-            } else {
-                // Redirect to a sane tab id
-                location.search = "?tab=overblik";
-            }
+        if( queryParams['tab'] === undefined || !["overblik", "visning"].includes(queryParams['tab']) ) {
+            this.redirectToUrlWithParams('overblik');
+        } else {
+            this.setState({view: queryParams["tab"]});
         }
-        if( queryParams["recordId"] !== undefined ) {
-            this.setState({recordId: queryParams["recordId"]});
-            this.getRecordFromRecordId(queryParams["recordId"], this.state.format);
+        let recordId = queryParams["recordId"] !== undefined ? queryParams["recordId"] : this.state.recordId;
+        let format = queryParams["format"] !== undefined ? queryParams["format"] : this.state.format;
+        this.setState({
+            recordId: recordId,
+            format: format
+        })
+        this.getRecordFromRecordId(recordId, format);
+    }
+
+    redirectToUrlWithParams(tab, format, recordId) {
+        let params = "?tab=" + tab + "&format=" + format + "&recordId=" + recordId
+        if( history.replaceState ) {
+            window.history.replaceState('', document.title, params);
+        } else {
+            location.search = params;
         }
     }
 
     handleTabSelect(view) {
         this.setState({view: view});
+        this.redirectToUrlWithParams(view, this.state.format, this.state.recordId);
     }
 
     handleRecordIdChange(event) {
@@ -70,13 +80,15 @@ class TickleRepoIntrospectGUI extends React.Component {
             format: "best"
         });
         this.getRecordFromRecordId(event.target.value, "best");
-        this.setState({view: "visning"});
+        this.setState({view: 'visning'});
+        this.redirectToUrlWithParams("visning", 'best', event.target.value);
     }
 
     handleChangeFormat(event) {
         const format = event.target.value;
         this.setState({format: format});
         this.getRecordFromRecordId(this.state.recordId, format);
+        this.redirectToUrlWithParams(this.state.view, format, this.state.recordId);
     }
 
     getInstance() {

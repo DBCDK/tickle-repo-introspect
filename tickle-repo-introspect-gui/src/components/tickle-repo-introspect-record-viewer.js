@@ -5,7 +5,6 @@
 
 import React from "react";
 import RawrepoIntrospectRecordFormatSelector from './tickle-repo-introspect-record-format-selector';
-import RawrepoIntrospectRecordCopy from './tickle-repo-introspect-record-copy';
 import queryString from "query-string";
 
 const HEIGHT_OFFSET = 190;
@@ -29,7 +28,6 @@ class TickleRepoIntrospectRecordViewer extends React.Component {
         this.setState({
             textareaCols: this.availableRows()
         });
-        console.log("cols=" + this.state.textareaCols);
     };
 
     availableRows() {
@@ -64,13 +62,8 @@ class TickleRepoIntrospectRecordViewer extends React.Component {
                             <RawrepoIntrospectRecordFormatSelector
                                 id='record-format-selector'
                                 format={this.props.format}
-                                onChangeFormat={this.props.onChangeFormat}
-                                recordLoaded={this.state.recordLoaded}/>
-                        </div>
-                        <div style={{marginLeft: '25px', float: 'left'}}>
-                            <RawrepoIntrospectRecordCopy
-                                onCopyToClipboard={this.props.onCopyToClipboard}
-                                recordLoaded={this.state.recordLoaded}/>
+                                handleChangeFormat={this.props.handleChangeFormat}
+                                recordLoaded={this.props.recordLoaded}/>
                         </div>
                     </div>
                 </div>
@@ -85,6 +78,7 @@ class TickleRepoIntrospectRecordViewer extends React.Component {
                                   lineHeight: LINE_HEIGHT + 'px',
                                   resize: 'none',
                                   backgroundColor: '#ffffff',
+                                  color: this.props.textColor,
                                   border: 'solid 1px #aaaaaa',
                                   whiteSpace: 'pre'
                               }}

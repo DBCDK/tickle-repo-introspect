@@ -22,15 +22,17 @@ class TickleRepoIntrospectGUI extends React.Component {
             instance: '',
             record: '',
             recordLoaded: false,
-            recordId: ''
+            recordId: '',
+            format: 'best'
         };
 
         this.getInstance = this.getInstance.bind(this);
         this.getDatasets = this.getDatasets.bind(this);
-        this.getRecordFromrecordId = this.getRecordFromrecordId.bind(this);
+        this.getRecordFromRecordId = this.getRecordFromRecordId.bind(this);
 
         this.handleTabSelect = this.handleTabSelect.bind(this);
-        this.handlerecordIdChange = this.handlerecordIdChange.bind(this);
+        this.handleRecordIdChange = this.handleRecordIdChange.bind(this);
+        this.handleChangeFormat = this.handleChangeFormat.bind(this);
     }
 
     componentDidMount() {
@@ -54,7 +56,7 @@ class TickleRepoIntrospectGUI extends React.Component {
         }
         if( queryParams["recordId"] !== undefined ) {
             this.setState({recordId: queryParams["recordId"]});
-            this.getRecordFromrecordId(queryParams["recordId"]);
+            this.getRecordFromRecordId(queryParams["recordId"], this.state.format);
         }
     }
 
@@ -62,9 +64,18 @@ class TickleRepoIntrospectGUI extends React.Component {
         this.setState({view: view});
     }
 
-    handlerecordIdChange(event) {
-        this.setState({recordId: event.target.value});
-        this.getRecordFromrecordId(event.target.value);
+    handleRecordIdChange(event) {
+        this.setState({
+            recordId: event.target.value,
+            format: "best"
+        });
+        this.getRecordFromRecordId(event.target.value, "best");
+    }
+
+    handleChangeFormat(event) {
+        const format = event.target.value;
+        this.setState({format: format});
+        this.getRecordFromRecordId(this.state.recordId, format);
     }
 
     getInstance() {
@@ -98,11 +109,13 @@ class TickleRepoIntrospectGUI extends React.Component {
             });
     }
 
-    getRecordFromrecordId(recordId) {
+    getRecordFromRecordId(recordId, format) {
         let parts = recordId.split(":");
         if( parts.length == 2 && parts[0].length > 0 && parts[1].length > 0 ) {
+            let query = recordId + (format == "best" ? "" : "?format=" + format);
+
             request
-                .get('/api/v1/record/' + recordId)
+                .get('/api/v1/records/' + query)
                 .set('Content-Type', 'text/plain')
                 .then(res => {
                     if( !res.ok ) {
@@ -115,13 +128,14 @@ class TickleRepoIntrospectGUI extends React.Component {
                 })
                 .catch(err => {
                     if( err.status == 400 ) {
-                        this.setState({
-                            record: '',
-                            recordLoaded: false
-                        });
+
                     } else {
                         alert(err.message);
                     }
+                    this.setState({
+                        record: '',
+                        recordLoaded: false
+                    });
                 });
         }
     }
@@ -134,7 +148,7 @@ class TickleRepoIntrospectGUI extends React.Component {
                            style={{marginLeft: '5px', marginRight: '20px', float: 'left'}}>
                         <input type="text"
                                value={this.state.recordId}
-                               onChange={this.handlerecordIdChange}
+                               onChange={this.handleRecordIdChange}
                                style={{width: RECORDID_WIDTH + 'px'}}/>
                     </label>
                     <h2>Tickle Repo <b>{this.state.instance}</b> - {this.state.datasets == undefined ? 0 : this.state.datasets.length} kilder</h2>
@@ -149,7 +163,10 @@ class TickleRepoIntrospectGUI extends React.Component {
                         </Tab>
                         <Tab eventKey={'visning'} title="Visning" style={{margin: '10px'}}>
                             <TickleRecordViewer record={this.state.record}
-                                                recordLoaded={this.state.recordLoaded}/>
+                                                recordLoaded={this.state.recordLoaded}
+                                                format={this.state.format}
+                                                handleChangeFormat={this.handleChangeFormat}
+                                                textColor='#000000'/>
                         </Tab>
                     </Tabs>
                 </div>

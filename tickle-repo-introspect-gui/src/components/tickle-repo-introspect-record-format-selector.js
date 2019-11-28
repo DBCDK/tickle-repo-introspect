@@ -12,7 +12,6 @@ class TickleRepoIntrospectRecordFormatSelector extends React.Component {
         super(props);
     }
 
-
     render() {
         const format = this.props.format;
 
@@ -20,22 +19,27 @@ class TickleRepoIntrospectRecordFormatSelector extends React.Component {
             <div>
                 <div id='format-div'>
                     <ButtonGroup id='button-tool-bar-format'>
-                        <Button onClick={this.props.onChangeFormat}
-                                bsStyle={format === 'line' ? 'primary' : 'default'}
+                        <Button onClick={this.props.handleChangeFormat}
+                                bsStyle={format === 'best' ? 'primary' : 'default'}
+                                style={{marginRight: '10px'}}
+                                id='button-format-best'
+                                value='best'
+                                disabled={!this.props.recordLoaded}>Bedste</Button>
+                        <Button onClick={this.props.handleChangeFormat}
+                                bsStyle={format === 'LINE' ? 'primary' : 'default'}
                                 id='button-format-line'
-                                value='line'
+                                value='LINE'
                                 disabled={!this.props.recordLoaded}>Linje</Button>
-                        <Button onClick={this.props.onChangeFormat}
-                                bsStyle={format === 'xml' ? 'primary' : 'default'}
+                        <Button onClick={this.props.handleChangeFormat}
+                                bsStyle={format === 'XML' ? 'primary' : 'default'}
                                 id='button-format-xml'
-                                value='xml'
-                                disabled={!this.props.recordLoaded}>MarcXchange</Button>
+                                value='XML'
+                                disabled={!this.props.recordLoaded}>XML</Button>
                     </ButtonGroup>
                 </div>
             </div>
         )
     }
-
 
 }
 

@@ -24,7 +24,9 @@ class TickleRepoIntrospectGUI extends React.Component {
             recordLoaded: false,
             recordId: '',
             format: 'best',
-            showBlanks: false
+            showBlanks: false,
+            isLineFormatSupported: true,
+            isXmlFormatSupported: true
         };
 
         this.getInstance = this.getInstance.bind(this);
@@ -128,6 +130,31 @@ class TickleRepoIntrospectGUI extends React.Component {
             });
     }
 
+    isLineFormat(body) {
+
+        // Heuristics: If the body starts with a tag-begin, is absolutely not lineformat
+        if( body.startsWith("<") ) {
+            return false;
+        }
+
+        // Could be marcxchange (m21) or just raw text, check for known pattern '001 xxxx...'
+        let lines = body.split("\n");
+        for( var i = 0; i < lines.length; i++ ) {
+            if( lines[i].startsWith("001 ") ) {
+                return true;
+            }
+        }
+
+        // Properbly not marcxchange
+        return false;
+    }
+
+    isXmlFormat(body) {
+
+        // Heuristics: Expect any type of xml to begin with a tag-begin '<'
+        return body.startsWith("<");
+    }
+
     getRecordFromRecordId(recordId, format) {
         let parts = recordId.split(":");
         if( parts.length == 2 && parts[0].length > 0 && parts[1].length > 0 ) {
@@ -142,8 +169,29 @@ class TickleRepoIntrospectGUI extends React.Component {
                     }
                     this.setState({
                         record: res.text,
-                        recordLoaded: true
+                        recordLoaded: true,
                     });
+                    if( format == 'best' ) {
+                        this.setState({
+                            isLineFormatSupported: this.isLineFormat(res.text),
+                            isXmlFormatSupported: this.isLineFormat(res.text) || this.isXmlFormat(res.text)
+                        })
+                    } else {
+                        if( format == 'LINE' && !this.isLineFormat(res.text) ) {
+                            this.setState({
+                                format: "best",
+                                isLineFormatSupported: false,
+                                isXmlFormatSupported: this.isXmlFormat(res.text)
+                            })
+                        }
+                        if( format == 'XML' && !(this.isLineFormat(res.text) || this.isXmlFormat(res.text)) ) {
+                            this.setState({
+                                format: "best",
+                                isLineFormatSupported: false,
+                                isXmlFormatSupported: false
+                            })
+                        }
+                    }
                 })
                 .catch(err => {
                     if( err.status == 400 ) {
@@ -187,7 +235,9 @@ class TickleRepoIntrospectGUI extends React.Component {
                                                 handleChangeFormat={this.handleChangeFormat}
                                                 textColor='#000000'
                                                 showBlanks={this.state.showBlanks}
-                                                handleShowBlanksChecked={this.handleShowBlanksChecked}/>
+                                                handleShowBlanksChecked={this.handleShowBlanksChecked}
+                                                isLineFormatSupported={this.state.isLineFormatSupported}
+                                                isXmlFormatSupported={this.state.isXmlFormatSupported}/>
                         </Tab>
                     </Tabs>
                 </div>

@@ -39,6 +39,17 @@ class TickleRepoIntrospectGUI extends React.Component {
         this.handleShowBlanksChecked = this.handleShowBlanksChecked.bind(this);
     }
 
+    setInitialTab(tab) {
+        this.setState({view: tab});
+    }
+
+    setRecordIdAndFormat(recordId, format) {
+        this.setState({
+            recordId: recordId,
+            format: format
+        })
+    }
+
     componentDidMount() {
         if (this.state.instance === '') {
             this.getInstance();
@@ -53,14 +64,11 @@ class TickleRepoIntrospectGUI extends React.Component {
         if( queryParams['tab'] === undefined || !["overblik", "visning"].includes(queryParams['tab']) ) {
             this.redirectToUrlWithParams('overblik');
         } else {
-            this.setState({view: queryParams["tab"]});
+            this.setInitialTab(queryParams["tab"]);
         }
         let recordId = queryParams["recordId"] !== undefined ? queryParams["recordId"] : this.state.recordId;
         let format = queryParams["format"] !== undefined ? queryParams["format"] : this.state.format;
-        this.setState({
-            recordId: recordId,
-            format: format
-        })
+        this.setRecordIdAndFormat(recordId, format);
         this.getRecordFromRecordId(recordId, format);
     }
 

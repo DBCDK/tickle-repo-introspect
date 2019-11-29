@@ -33,7 +33,12 @@ class TickleRepoIntrospectRecordFormatSelector extends React.Component {
                                 bsStyle={format === 'XML' ? 'primary' : 'default'}
                                 id='button-format-xml'
                                 value='XML'
-                                disabled={!this.props.recordLoaded}>XML</Button>
+                                disabled={!this.props.recordLoaded}>Xml</Button>
+                        <Button onClick={this.props.handleChangeFormat}
+                                bsStyle={format === 'RAW' ? 'primary' : 'default'}
+                                id='button-format-raw'
+                                value='RAW'
+                                disabled={!this.props.recordLoaded}>Rå</Button>
                     </ButtonGroup>
                     {
                         format == 'LINE' ?

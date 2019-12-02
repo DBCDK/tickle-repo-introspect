@@ -227,6 +227,11 @@ class TickleRepoIntrospectGUI extends React.Component {
         }
     }
 
+    getBaseUrl() {
+        let parts = window.location.toString().split("?");
+        return parts.length > 0 ? parts[0] : window.location;
+    }
+
     render() {
         return (
             <div style={{width: '100%', overflow: 'hidden'}}>
@@ -243,7 +248,7 @@ class TickleRepoIntrospectGUI extends React.Component {
                                onChange={this.handleLocalIdChange}
                                style={{width: LOCALID_WIDTH + 'px'}}/>
                     </label>
-                    <h2>Tickle Repo <b>{this.state.instance}</b> - {this.state.datasets == undefined ? 0 : this.state.datasets.length} kilder</h2>
+                    <h2><a href={this.getBaseUrl()}>Tickle Repo</a> <b>{this.state.instance}</b> - {this.state.datasets == undefined ? 0 : this.state.datasets.length} kilder</h2>
                 </div>
                 <div>
                     <Tabs activeKey={this.state.view}

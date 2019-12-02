@@ -10,7 +10,8 @@ import TickleRecordViewer from "./tickle-repo-introspect-record-viewer";
 import queryString from 'query-string'
 
 const request = require('superagent');
-const RECORDID_WIDTH = 500;
+const LOCALID_WIDTH = 100;
+const DATASET_WIDTH = 300;
 
 class TickleRepoIntrospectGUI extends React.Component {
 
@@ -22,6 +23,8 @@ class TickleRepoIntrospectGUI extends React.Component {
             instance: '',
             record: '',
             recordLoaded: false,
+            dataSet: '',
+            localId: '',
             recordId: '',
             format: 'best',
             showBlanks: false,
@@ -34,7 +37,8 @@ class TickleRepoIntrospectGUI extends React.Component {
         this.getRecordFromRecordId = this.getRecordFromRecordId.bind(this);
 
         this.handleTabSelect = this.handleTabSelect.bind(this);
-        this.handleRecordIdChange = this.handleRecordIdChange.bind(this);
+        this.handleDataSethange = this.handleDataSetChange.bind(this);
+        this.handleLocalIdChange = this.handleLocalIdChange.bind(this);
         this.handleChangeFormat = this.handleChangeFormat.bind(this);
         this.handleShowBlanksChecked = this.handleShowBlanksChecked.bind(this);
     }
@@ -86,14 +90,22 @@ class TickleRepoIntrospectGUI extends React.Component {
         this.redirectToUrlWithParams(view, this.state.format, this.state.recordId);
     }
 
-    handleRecordIdChange(event) {
+    setNewRecordId(recordId) {
         this.setState({
-            recordId: event.target.value,
+            recordId: recordId,
             format: "best"
         });
-        this.getRecordFromRecordId(event.target.value, "best");
+        this.getRecordFromRecordId(recordId, "best");
         this.setState({view: 'visning'});
-        this.redirectToUrlWithParams("visning", 'best', event.target.value);
+        this.redirectToUrlWithParams("visning", 'best', recordId);
+    }
+
+    handleDataSetChange(event) {
+        // Todo: handle partial record id
+    }
+
+    handleLocalIdChange(event) {
+        // Todo: handle partial record id
     }
 
     handleChangeFormat(event) {
@@ -222,9 +234,14 @@ class TickleRepoIntrospectGUI extends React.Component {
                     <label className={'recordId-label'}
                            style={{marginLeft: '5px', marginRight: '20px', float: 'left'}}>
                         <input type="text"
-                               value={this.state.recordId}
-                               onChange={this.handleRecordIdChange}
-                               style={{width: RECORDID_WIDTH + 'px'}}/>
+                               value={this.state.dataSet}
+                               onChange={this.handleDataSetChange}
+                               style={{width: DATASET_WIDTH + 'px'}}/>
+                               &nbsp;:&nbsp;
+                        <input type="text"
+                               value={this.state.localId}
+                               onChange={this.handleLocalIdChange}
+                               style={{width: LOCALID_WIDTH + 'px'}}/>
                     </label>
                     <h2>Tickle Repo <b>{this.state.instance}</b> - {this.state.datasets == undefined ? 0 : this.state.datasets.length} kilder</h2>
                 </div>
@@ -238,6 +255,7 @@ class TickleRepoIntrospectGUI extends React.Component {
                         </Tab>
                         <Tab eventKey={'visning'} title="Visning" style={{margin: '10px'}}>
                             <TickleRecordViewer record={this.state.record}
+                                                recordId={this.state.recordId}
                                                 recordLoaded={this.state.recordLoaded}
                                                 format={this.state.format}
                                                 handleChangeFormat={this.handleChangeFormat}

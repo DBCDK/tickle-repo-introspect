@@ -56,6 +56,7 @@ class TickleRepoIntrospectRecordViewer extends React.Component {
                             <RawrepoIntrospectRecordFormatSelector
                                 id='record-format-selector'
                                 format={this.props.format}
+                                recordId={this.props.recordId}
                                 handleChangeFormat={this.props.handleChangeFormat}
                                 recordLoaded={this.props.recordLoaded}
                                 showBlanks={this.props.showBlanks}

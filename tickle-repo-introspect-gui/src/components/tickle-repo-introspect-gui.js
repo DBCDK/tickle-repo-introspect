@@ -45,6 +45,7 @@ class TickleRepoIntrospectGUI extends React.Component {
         this.handleLocalIdChange = this.handleLocalIdChange.bind(this);
         this.handleChangeFormat = this.handleChangeFormat.bind(this);
         this.handleShowBlanksChecked = this.handleShowBlanksChecked.bind(this);
+        this.handleResetLinkClicked = this.handleResetLinkClicked.bind(this);
 
         this.localIdRef = React.createRef();
     }
@@ -57,7 +58,7 @@ class TickleRepoIntrospectGUI extends React.Component {
         this.setState({
             recordId: recordId,
             format: format,
-            recordIdWidth: recordId.length * FONT_WIDTH_FACTOR
+            recordIdWidth: recordId.length * FONT_WIDTH_FACTOR,
         })
     }
 
@@ -142,6 +143,20 @@ class TickleRepoIntrospectGUI extends React.Component {
 
     handleShowBlanksChecked(event) {
         this.setState({showBlanks: !this.state.showBlanks});
+    }
+
+    handleResetLinkClicked(event) {
+        this.setState({
+            localId: '',
+            dataSet: '',
+            recordId: '',
+            recordIdWidth: 0,
+            record: '',
+            recordLoaded: false
+        });
+        if( this.state.view == 'visning' ) {
+            event.preventDefault();
+        }
     }
 
     getInstance() {
@@ -287,7 +302,7 @@ class TickleRepoIntrospectGUI extends React.Component {
                                autoFocus
                                ref={this.localIdRef}/>
                     </label>
-                    <h2><a href={this.getBaseUrl()}>Tickle Repo</a> <b>{this.state.instance}</b> - {this.state.datasets == undefined ? 0 : this.state.datasets.length} kilder</h2>
+                    <h2><a href={this.getBaseUrl()} onClick={this.handleResetLinkClicked}>Tickle Repo</a> <b>{this.state.instance}</b> - {this.state.datasets == undefined ? 0 : this.state.datasets.length} kilder</h2>
                 </div>
                 <div>
                     <Tabs activeKey={this.state.view}

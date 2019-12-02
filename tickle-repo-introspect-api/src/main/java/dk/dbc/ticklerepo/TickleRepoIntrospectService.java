@@ -14,6 +14,7 @@ import dk.dbc.marc.writer.DanMarc2LineFormatWriter;
 import dk.dbc.marc.writer.LineFormatWriter;
 import dk.dbc.marc.writer.MarcWriterException;
 import dk.dbc.ticklerepo.dto.DataSet;
+import dk.dbc.ticklerepo.dto.DataSetListDTO;
 import dk.dbc.ticklerepo.dto.DataSetSummary;
 import dk.dbc.ticklerepo.dto.DataSetSummaryListDTO;
 import dk.dbc.ticklerepo.dto.ErrorDTO;
@@ -150,6 +151,21 @@ public class TickleRepoIntrospectService {
         res = recordDataToText(record.get().getContent(), format);
 
         return Response.ok(res, MediaType.TEXT_PLAIN).build();
+    }
+
+    @GET
+    @Produces({MediaType.TEXT_PLAIN})
+    @Path("datasets/by-local-id/{localId}")
+    public Response getDataSetsByRecordId(@PathParam("localId") String localId) {
+        final Record lookupRecord = new Record()
+                .withLocalId(localId);
+
+        final List<DataSet> dataSets = tickleRepo.lookupDataSetByRecord(lookupRecord);
+
+        final DataSetListDTO result = new DataSetListDTO();
+        result.setDatasets(dataSets);
+
+        return Response.ok(result, MediaType.APPLICATION_JSON).build();
     }
 
     private String recordDataToText(byte[] content, String format) {

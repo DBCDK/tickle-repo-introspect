@@ -23,21 +23,19 @@ class TickleRepoIntrospectGUI extends React.Component {
         this.state = {
             view: 'overblik',
             instance: '',
-            record: '',
+            record: null,
             recordLoaded: false,
             dataSet: '',
             localId: '',
             recordId: '',
-            format: 'best',
+            format: '',
             showBlanks: false,
-            isLineFormatSupported: true,
-            isXmlFormatSupported: true,
             recordIdWidth: 0
         };
 
         this.getInstance = this.getInstance.bind(this);
         this.getDatasets = this.getDatasets.bind(this);
-        this.setRecordIdAndFormat = this.setRecordIdAndFormat.bind(this);
+        this.setNewRecordId = this.setNewRecordId.bind(this);
         this.getRecordFromRecordId = this.getRecordFromRecordId.bind(this);
 
         this.handleTabSelect = this.handleTabSelect.bind(this);
@@ -54,12 +52,13 @@ class TickleRepoIntrospectGUI extends React.Component {
         this.setState({view: tab});
     }
 
-    setRecordIdAndFormat(recordId, format) {
+    setNewRecordId(recordId) {
         this.setState({
-            recordId: recordId,
-            format: format,
-            recordIdWidth: recordId.length * FONT_WIDTH_FACTOR,
-        })
+            format: '',
+            view: 'visning'
+        });
+        this.getRecordFromRecordId(recordId);
+        this.redirectToUrlWithParams("visning", recordId);
     }
 
     componentDidMount() {
@@ -73,19 +72,28 @@ class TickleRepoIntrospectGUI extends React.Component {
 
         // Check for initial values from the querystring
         const queryParams = queryString.parse(location.search);
-        if( queryParams['tab'] === undefined || !["overblik", "visning"].includes(queryParams['tab']) ) {
-            this.redirectToUrlWithParams('overblik');
-        } else {
-            this.setInitialTab(queryParams["tab"]);
-        }
         let recordId = queryParams["recordId"] !== undefined ? queryParams["recordId"] : this.state.recordId;
-        let format = queryParams["format"] !== undefined ? queryParams["format"] : this.state.format;
-        this.setRecordIdAndFormat(recordId, format);
-        this.getRecordFromRecordId(recordId, format);
+        if( queryParams['tab'] === undefined || !["overblik", "visning"].includes(queryParams['tab']) ) {
+            this.redirectToUrlWithParams('overblik', recordId);
+        } else {
+            this.setInitialTab(queryParams["tab"], recordId);
+        }
+        this.getRecordFromRecordId(recordId);
+
+        // If we have an initial recordid, fill out the dataset and localid fields
+        if( recordId != '' ) {
+            let parts = recordId.split(":");
+            if( parts.length == 2) {
+                this.setState({
+                    dataSet: parts[0],
+                    localId: parts[1]
+                });
+            }
+        }
     }
 
-    redirectToUrlWithParams(tab, format, recordId) {
-        let params = "?tab=" + tab + "&format=" + format + "&recordId=" + recordId
+    redirectToUrlWithParams(tab, recordId) {
+        let params = "?tab=" + tab + "&recordId=" + recordId
         if( history.replaceState ) {
             window.history.replaceState('', document.title, params);
         } else {
@@ -95,14 +103,7 @@ class TickleRepoIntrospectGUI extends React.Component {
 
     handleTabSelect(view) {
         this.setState({view: view});
-        this.redirectToUrlWithParams(view, this.state.format, this.state.recordId);
-    }
-
-    setNewRecordId(recordId) {
-        this.setRecordIdAndFormat(recordId, 'best');
-        this.getRecordFromRecordId(recordId, "best");
-        this.setState({view: 'visning'});
-        this.redirectToUrlWithParams("visning", 'best', recordId);
+        this.redirectToUrlWithParams(view);
     }
 
     handleDataSetChange(event) {
@@ -137,8 +138,7 @@ class TickleRepoIntrospectGUI extends React.Component {
     handleChangeFormat(event) {
         const format = event.target.value;
         this.setState({format: format});
-        this.getRecordFromRecordId(this.state.recordId, format);
-        this.redirectToUrlWithParams(this.state.view, format, this.state.recordId);
+        this.getRecordFromRecordId(this.state.recordId);
     }
 
     handleShowBlanksChecked(event) {
@@ -151,11 +151,16 @@ class TickleRepoIntrospectGUI extends React.Component {
             dataSet: '',
             recordId: '',
             recordIdWidth: 0,
-            record: '',
+            record: null,
+            format: '',
             recordLoaded: false
         });
+
+        this.redirectToUrlWithParams(this.state.view, '');
+
         if( this.state.view == 'visning' ) {
             event.preventDefault();
+            this.localIdRef.current.focus();
         }
     }
 
@@ -190,78 +195,57 @@ class TickleRepoIntrospectGUI extends React.Component {
             });
     }
 
-    isLineFormat(body) {
-
-        // Heuristics: If the body starts with a tag-begin, is absolutely not lineformat
-        if( body.startsWith("<") ) {
-            return false;
-        }
-
-        // Could be marcxchange (m21) or just raw text, check for known pattern '001 xxxx...'
-        let lines = body.split("\n");
-        for( var i = 0; i < lines.length; i++ ) {
-            if( lines[i].startsWith("001 ") ) {
-                return true;
-            }
-        }
-
-        // Properbly not marcxchange
-        return false;
-    }
-
-    isXmlFormat(body) {
-
-        // Heuristics: Expect any type of xml to begin with a tag-begin '<'
-        return body.startsWith("<");
-    }
-
-    getRecordFromRecordId(recordId, format) {
+    getRecordFromRecordId(recordId) {
         let parts = recordId.split(":");
         if( parts.length == 2 && parts[0].length > 0 && parts[1].length > 0 ) {
-            let query = recordId + (format == "best" ? "" : "?format=" + format);
+            let query = recordId;
 
             request
                 .get('/api/v1/records/' + query)
                 .set('Content-Type', 'text/plain')
                 .then(res => {
+
+                    // Error check
                     if( !res.ok ) {
                         throw new Error(res.status);
                     }
-                    this.setState({
-                        record: res.text,
-                        recordLoaded: true,
-                    });
-                    if( format == 'best' ) {
+
+                    // If the record is not found, we get an empty message back
+                    if( res.text == '' ) {
                         this.setState({
-                            isLineFormatSupported: this.isLineFormat(res.text),
-                            isXmlFormatSupported: this.isLineFormat(res.text) || this.isXmlFormat(res.text)
-                        })
-                    } else {
-                        if( format == 'LINE' && !this.isLineFormat(res.text) ) {
-                            this.setState({
-                                format: "best",
-                                isLineFormatSupported: false,
-                                isXmlFormatSupported: this.isXmlFormat(res.text)
-                            })
-                        }
-                        if( format == 'XML' && !(this.isLineFormat(res.text) || this.isXmlFormat(res.text)) ) {
-                            this.setState({
-                                format: "best",
-                                isLineFormatSupported: false,
-                                isXmlFormatSupported: false
-                            })
+                            record: null,
+                            recordLoaded: false,
+                            recordId: ''
+                        });
+                        return;
+                    }
+
+                    // Select format, if none is set
+                    let format = this.state.format;
+                    if( format == '' ) {
+                        if( res.body.contentLine != '' ) {
+                            format = 'LINE';
+                        } else if( res.body.contentXml != '' ) {
+                            format = 'XML';
+                        } else {
+                            format = 'RAW';
                         }
                     }
+
+                    // Record exists
+                    this.setState({
+                        record: res.body,
+                        recordLoaded: true,
+                        recordId: recordId,
+                        format: format
+                    });
                 })
                 .catch(err => {
-                    if( err.status == 400 ) {
-
-                    } else {
-                        alert(err.message);
-                    }
+                    alert(err.message);
                     this.setState({
                         record: '',
-                        recordLoaded: false
+                        recordLoaded: false,
+                        recordId: ''
                     });
                 });
         }

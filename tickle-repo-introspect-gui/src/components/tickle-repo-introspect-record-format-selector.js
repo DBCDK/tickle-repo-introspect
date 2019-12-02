@@ -24,20 +24,15 @@ class TickleRepoIntrospectRecordFormatSelector extends React.Component {
                 <div id='format-div'>
                     <ButtonGroup id='button-tool-bar-format'>
                         <Button onClick={this.props.handleChangeFormat}
-                                bsStyle={format === 'best' ? 'primary' : 'default'}
-                                id='button-format-best'
-                                value='best'
-                                disabled={!this.props.recordLoaded}>Bedste</Button>
-                        <Button onClick={this.props.handleChangeFormat}
                                 bsStyle={format === 'LINE' ? 'primary' : 'default'}
                                 id='button-format-line'
                                 value='LINE'
-                                disabled={!this.props.recordLoaded || !this.props.isLineFormatSupported}>Linje</Button>
+                                disabled={!this.props.recordLoaded || this.props.record.contentLine == ''}>Linje</Button>
                         <Button onClick={this.props.handleChangeFormat}
                                 bsStyle={format === 'XML' ? 'primary' : 'default'}
                                 id='button-format-xml'
                                 value='XML'
-                                disabled={!this.props.recordLoaded || !this.props.isXmlFormatSupported}>Xml</Button>
+                                disabled={!this.props.recordLoaded || this.props.record.contentXml == ''}>Xml</Button>
                         <Button onClick={this.props.handleChangeFormat}
                                 bsStyle={format === 'RAW' ? 'primary' : 'default'}
                                 id='button-format-raw'

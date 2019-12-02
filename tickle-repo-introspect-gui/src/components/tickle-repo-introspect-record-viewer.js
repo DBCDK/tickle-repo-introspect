@@ -46,6 +46,20 @@ class TickleRepoIntrospectRecordViewer extends React.Component {
         window.removeEventListener("resize", this.updateDimensions);
     }
 
+    getRecordForSelectedFormat() {
+        if( this.props.record == null ) {
+            return '';
+        }
+        switch (this.props.format) {
+            case 'LINE':
+                return this.props.showBlanks ? this.props.record.contentLine.replace(/ /g, '_') : this.props.record.contentLine;
+            case 'XML':
+                return this.props.record.contentXml;
+            default:
+                return this.props.record.contentRaw;
+        }
+    }
+
     render() {
         return (
 
@@ -56,6 +70,7 @@ class TickleRepoIntrospectRecordViewer extends React.Component {
                             <RawrepoIntrospectRecordFormatSelector
                                 id='record-format-selector'
                                 format={this.props.format}
+                                record={this.props.record}
                                 recordId={this.props.recordId}
                                 handleChangeFormat={this.props.handleChangeFormat}
                                 recordLoaded={this.props.recordLoaded}
@@ -68,7 +83,7 @@ class TickleRepoIntrospectRecordViewer extends React.Component {
                     </div>
                 </div>
                 <div className="flex-container">
-                    <textarea value={ this.props.showBlanks && this.props.format == 'LINE' ? this.props.record.replace(/ /g, "_") : this.props.record }
+                    <textarea value={ this.getRecordForSelectedFormat() }
                               readOnly={true}
                               style={{
                                   width: '100%',

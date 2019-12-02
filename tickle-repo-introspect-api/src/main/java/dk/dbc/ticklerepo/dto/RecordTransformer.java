@@ -38,8 +38,8 @@ public class RecordTransformer {
         dto.setLocalId(record.getLocalId());
         dto.setTrackingId(record.getTrackingId());
         dto.setStatus(record.getStatus().toString());
-        dto.setTimeOfCreation(record.getTimeOfCreation());
-        dto.setTimeOfLastModification(record.getTimeOfLastModification());
+        dto.setTimeOfCreation(record.getTimeOfCreation().getTime());
+        dto.setTimeOfLastModification(record.getTimeOfLastModification().getTime());
         dto.setChecksum(record.getChecksum());
         dto.setContentLine(recordDataToLine(record.getContent()));
         dto.setContentXml(recordDataToXml(record.getContent()));

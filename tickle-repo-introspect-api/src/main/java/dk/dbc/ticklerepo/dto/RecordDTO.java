@@ -1,7 +1,5 @@
 package dk.dbc.ticklerepo.dto;
 
-import java.sql.Timestamp;
-
 public class RecordDTO {
 
     private int id;
@@ -10,8 +8,8 @@ public class RecordDTO {
     private String localId;
     private String trackingId;
     private String status;
-    private Timestamp timeOfCreation;
-    private Timestamp timeOfLastModification;
+    private long timeOfCreation;
+    private long timeOfLastModification;
     private String checksum;
     private String contentLine;
     private String contentXml;
@@ -65,19 +63,19 @@ public class RecordDTO {
         this.status = status;
     }
 
-    public Timestamp getTimeOfCreation() {
+    public long getTimeOfCreation() {
         return timeOfCreation;
     }
 
-    public void setTimeOfCreation(Timestamp timeOfCreation) {
+    public void setTimeOfCreation(long timeOfCreation) {
         this.timeOfCreation = timeOfCreation;
     }
 
-    public Timestamp getTimeOfLastModification() {
+    public long getTimeOfLastModification() {
         return timeOfLastModification;
     }
 
-    public void setTimeOfLastModification(Timestamp timeOfLastModification) {
+    public void setTimeOfLastModification(long timeOfLastModification) {
         this.timeOfLastModification = timeOfLastModification;
     }
 

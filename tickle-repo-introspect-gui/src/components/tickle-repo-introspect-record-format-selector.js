@@ -6,12 +6,14 @@
 import React from "react";
 import {Button, ButtonGroup, ToggleButtonGroup, ToggleButton} from "react-bootstrap";
 
-const RECORDID_WIDTH = 500;
+const FONT_SIZE = 14;
 
 class TickleRepoIntrospectRecordFormatSelector extends React.Component {
 
     constructor(props) {
         super(props);
+
+        this.recordIdRef = React.createRef();
     }
 
     render() {
@@ -54,14 +56,20 @@ class TickleRepoIntrospectRecordFormatSelector extends React.Component {
                         </ToggleButtonGroup>
                         : ''
                     }
-                    <input value={this.props.recordId}
-                           style={{
-                               width: RECORDID_WIDTH + 'px',
-                               position: 'relative',
-                               top: '2px',
-                               marginLeft: '50px'
-                           }}
-                           readOnly={true}/>
+                    {
+                        this.props.recordIdWidth > 0 ?
+                            <input value={this.props.recordId}
+                                   style={{
+                                       width: this.props.recordIdWidth + 'px',
+                                       position: 'relative',
+                                       top: '2px',
+                                       marginLeft: '50px',
+                                       fontFamily: 'Courier New',
+                                       fontSize: FONT_SIZE + 'px'
+                                   }}
+                                   readOnly={true}/>
+                            : ''
+                    }
                 </div>
             </div>
         )

@@ -12,6 +12,8 @@ import queryString from 'query-string'
 const request = require('superagent');
 const LOCALID_WIDTH = 100;
 const DATASET_WIDTH = 300;
+const FONT_WIDTH_FACTOR = 10; // This is somewhat unprecise, adjust to fit the font in use
+const FONT_SIZE = 14;
 
 class TickleRepoIntrospectGUI extends React.Component {
 
@@ -29,18 +31,22 @@ class TickleRepoIntrospectGUI extends React.Component {
             format: 'best',
             showBlanks: false,
             isLineFormatSupported: true,
-            isXmlFormatSupported: true
+            isXmlFormatSupported: true,
+            recordIdWidth: 0
         };
 
         this.getInstance = this.getInstance.bind(this);
         this.getDatasets = this.getDatasets.bind(this);
+        this.setRecordIdAndFormat = this.setRecordIdAndFormat.bind(this);
         this.getRecordFromRecordId = this.getRecordFromRecordId.bind(this);
 
         this.handleTabSelect = this.handleTabSelect.bind(this);
-        this.handleDataSethange = this.handleDataSetChange.bind(this);
+        this.handleDataSetChange = this.handleDataSetChange.bind(this);
         this.handleLocalIdChange = this.handleLocalIdChange.bind(this);
         this.handleChangeFormat = this.handleChangeFormat.bind(this);
         this.handleShowBlanksChecked = this.handleShowBlanksChecked.bind(this);
+
+        this.localIdRef = React.createRef();
     }
 
     setInitialTab(tab) {
@@ -50,7 +56,8 @@ class TickleRepoIntrospectGUI extends React.Component {
     setRecordIdAndFormat(recordId, format) {
         this.setState({
             recordId: recordId,
-            format: format
+            format: format,
+            recordIdWidth: recordId.length * FONT_WIDTH_FACTOR
         })
     }
 
@@ -91,21 +98,39 @@ class TickleRepoIntrospectGUI extends React.Component {
     }
 
     setNewRecordId(recordId) {
-        this.setState({
-            recordId: recordId,
-            format: "best"
-        });
+        this.setRecordIdAndFormat(recordId, 'best');
         this.getRecordFromRecordId(recordId, "best");
         this.setState({view: 'visning'});
         this.redirectToUrlWithParams("visning", 'best', recordId);
     }
 
     handleDataSetChange(event) {
-        // Todo: handle partial record id
+        let parts = event.target.value.split(":");
+        if( parts.length == 2 ) {
+            this.setState({
+                dataSet: parts[0],
+                localId: parts[1]
+            });
+            this.setNewRecordId(parts[0] + ":" + parts[1]);
+            this.localIdRef.current.focus();
+        } else {
+            this.setState({dataSet: event.target.value});
+            this.setNewRecordId(event.target.value + ":" + this.state.localId);
+        }
     }
 
     handleLocalIdChange(event) {
-        // Todo: handle partial record id
+        let parts = event.target.value.split(":");
+        if( parts.length == 2 ) {
+            this.setState({
+                dataSet: parts[0],
+                localId: parts[1]
+            });
+            this.setNewRecordId(parts[0] + ":" + parts[1]);
+        } else {
+            this.setState({localId: event.target.value});
+            this.setNewRecordId(this.state.dataSet + ":" + event.target.value);
+        }
     }
 
     handleChangeFormat(event) {
@@ -241,12 +266,26 @@ class TickleRepoIntrospectGUI extends React.Component {
                         <input type="text"
                                value={this.state.dataSet}
                                onChange={this.handleDataSetChange}
-                               style={{width: DATASET_WIDTH + 'px'}}/>
+                               style={{
+                                   width: this.state.dataSet.length < 10
+                                       ? 10 * FONT_WIDTH_FACTOR
+                                       : this.state.dataSet.length * FONT_WIDTH_FACTOR,
+                                   fontFamily: 'Courier New',
+                                   fontSize: FONT_SIZE + 'px',
+                               }}/>
                                &nbsp;:&nbsp;
                         <input type="text"
                                value={this.state.localId}
                                onChange={this.handleLocalIdChange}
-                               style={{width: LOCALID_WIDTH + 'px'}}/>
+                               style={{
+                                   width: this.state.localId.length < 10
+                                   ? 10 * FONT_WIDTH_FACTOR
+                                   : this.state.localId.length * FONT_WIDTH_FACTOR,
+                                   fontFamily: 'Courier New',
+                                   fontSize: FONT_SIZE + 'px'
+                               }}
+                               autoFocus
+                               ref={this.localIdRef}/>
                     </label>
                     <h2><a href={this.getBaseUrl()}>Tickle Repo</a> <b>{this.state.instance}</b> - {this.state.datasets == undefined ? 0 : this.state.datasets.length} kilder</h2>
                 </div>
@@ -268,7 +307,8 @@ class TickleRepoIntrospectGUI extends React.Component {
                                                 showBlanks={this.state.showBlanks}
                                                 handleShowBlanksChecked={this.handleShowBlanksChecked}
                                                 isLineFormatSupported={this.state.isLineFormatSupported}
-                                                isXmlFormatSupported={this.state.isXmlFormatSupported}/>
+                                                isXmlFormatSupported={this.state.isXmlFormatSupported}
+                                                recordIdWidth={this.state.recordIdWidth}/>
                         </Tab>
                     </Tabs>
                 </div>

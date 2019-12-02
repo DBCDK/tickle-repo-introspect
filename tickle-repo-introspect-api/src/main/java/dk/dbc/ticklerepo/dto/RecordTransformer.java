@@ -25,8 +25,12 @@ public class RecordTransformer {
     private static final DanMarc2LineFormatWriter DANMARC_2_LINE_FORMAT_WRITER = new DanMarc2LineFormatWriter();
     private static final LineFormatWriter LINE_FORMAT_WRITER = new LineFormatWriter();
 
+    static {
+        LINE_FORMAT_WRITER.setProperty(LineFormatWriter.Property.INCLUDE_LEADER, true);
+    }
+
     public static RecordDTO recordToDTO(Record record) {
-        RecordDTO dto = new RecordDTO();
+        final RecordDTO dto = new RecordDTO();
 
         dto.setId(record.getId());
         dto.setBatch(record.getBatch());

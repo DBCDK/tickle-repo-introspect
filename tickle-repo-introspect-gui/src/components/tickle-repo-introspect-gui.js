@@ -30,11 +30,13 @@ class TickleRepoIntrospectGUI extends React.Component {
             recordId: '',
             format: '',
             showBlanks: false,
-            recordIdWidth: 0
+            recordIdWidth: 0,
+            dataSetsForLocalId: []
         };
 
         this.getInstance = this.getInstance.bind(this);
         this.getDatasets = this.getDatasets.bind(this);
+        this.getDatasetsByLocalId = this.getDatasetsByLocalId.bind(this);
         this.setNewRecordId = this.setNewRecordId.bind(this);
         this.getRecordFromRecordId = this.getRecordFromRecordId.bind(this);
 
@@ -131,7 +133,12 @@ class TickleRepoIntrospectGUI extends React.Component {
             this.setNewRecordId(parts[0] + ":" + parts[1]);
         } else {
             this.setState({localId: event.target.value});
-            this.setNewRecordId(this.state.dataSet + ":" + event.target.value);
+
+            if( this.state.dataSet == '' ) {
+                this.getDatasetsByLocalId(event.target.value);
+            } else {
+                this.setNewRecordId(this.state.dataSet + ":" + event.target.value);
+            }
         }
     }
 
@@ -189,6 +196,31 @@ class TickleRepoIntrospectGUI extends React.Component {
                 this.setState({
                     datasets: datasets
                 });
+            })
+            .catch(err => {
+                alert(err.message);
+            });
+    }
+
+    getDatasetsByLocalId(localId) {
+        if( localId.length == 0) {
+            return;
+        }
+        request
+            .get('/api/v1/datasets/by-local-id/' + localId)
+            .set('Accepts', 'application/json')
+            .then(res => {
+                let dataSets = res.body.datasets !== undefined ? res.body.datasets : [];
+                if( dataSets.length == 1 ) {
+                    this.setState({
+                        dataSet: dataSets[0].name
+                    });
+                    this.setNewRecordId(dataSets[0].name + ":" + localId);
+                } else if( dataSets.length > 1 ) {
+                    // Todo: combobox logic
+                    console.log("MULTIPLE datasets");
+                    console.log(dataSets);
+                }
             })
             .catch(err => {
                 alert(err.message);

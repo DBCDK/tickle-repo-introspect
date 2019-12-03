@@ -9,13 +9,13 @@ import java.util.List;
 
 public class DataSetSummaryListDTO {
 
-    private List<DataSetSummary> dataSets;
+    private List<DataSetSummaryDTO> dataSets;
 
-    public List<DataSetSummary> getDataSets() {
+    public List<DataSetSummaryDTO> getDataSets() {
         return dataSets;
     }
 
-    public void setDataSets(List<DataSetSummary> dataSets) {
+    public void setDataSets(List<DataSetSummaryDTO> dataSets) {
         this.dataSets = dataSets;
     }
 }

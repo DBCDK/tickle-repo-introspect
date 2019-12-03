@@ -5,13 +5,13 @@
 
 package dk.dbc.ticklerepo;
 
+import dk.dbc.ticklerepo.dto.DTOTransformer;
 import dk.dbc.ticklerepo.dto.DataSet;
 import dk.dbc.ticklerepo.dto.DataSetListDTO;
 import dk.dbc.ticklerepo.dto.DataSetSummary;
 import dk.dbc.ticklerepo.dto.DataSetSummaryListDTO;
 import dk.dbc.ticklerepo.dto.Record;
 import dk.dbc.ticklerepo.dto.RecordDTO;
-import dk.dbc.ticklerepo.dto.RecordTransformer;
 import dk.dbc.util.StopwatchInterceptor;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.slf4j.Logger;
@@ -63,7 +63,7 @@ public class TickleRepoIntrospectService {
         final List<DataSetSummary> dataSets = tickleRepo.getDataSetSummary();
         final DataSetSummaryListDTO list = new DataSetSummaryListDTO();
 
-        list.setDataSets(dataSets);
+        list.setDataSets(DTOTransformer.dataSetSummaryListToDTO(dataSets));
 
         return Response.ok(list, MediaType.APPLICATION_JSON).build();
     }
@@ -103,7 +103,7 @@ public class TickleRepoIntrospectService {
             return Response.ok(null, MediaType.APPLICATION_JSON).build();
         }
 
-        final RecordDTO dto = RecordTransformer.recordToDTO(record.get());
+        final RecordDTO dto = DTOTransformer.recordToDTO(record.get());
 
         return Response.ok(dto).build();
     }

@@ -1,3 +1,8 @@
+/*
+ * Copyright Dansk Bibliotekscenter a/s. Licensed under GNU GPL v3
+ *  See license text at https://opensource.dbc.dk/licenses/gpl-3.0
+ */
+
 package dk.dbc.ticklerepo.dto;
 
 import dk.dbc.marc.binding.ControlField;
@@ -20,13 +25,39 @@ import java.io.ByteArrayInputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
-public class RecordTransformer {
+public class DTOTransformer {
     private static final DanMarc2LineFormatWriter DANMARC_2_LINE_FORMAT_WRITER = new DanMarc2LineFormatWriter();
     private static final LineFormatWriter LINE_FORMAT_WRITER = new LineFormatWriter();
 
     static {
         LINE_FORMAT_WRITER.setProperty(LineFormatWriter.Property.INCLUDE_LEADER, true);
+    }
+
+    public static List<DataSetSummaryDTO> dataSetSummaryListToDTO(List<DataSetSummary> dataSetSummaryList) {
+        final List<DataSetSummaryDTO> dtos = new ArrayList<>();
+
+        for (DataSetSummary dataSetSummary : dataSetSummaryList) {
+            dtos.add(dataSetSummaryToDTO(dataSetSummary));
+        }
+
+        return dtos;
+    }
+
+    public static DataSetSummaryDTO dataSetSummaryToDTO(DataSetSummary dataSetSummary) {
+        final DataSetSummaryDTO dto = new DataSetSummaryDTO();
+
+        dto.setName(dataSetSummary.getName());
+        dto.setSum(dataSetSummary.getSum());
+        dto.setActive(dataSetSummary.getActive());
+        dto.setDeleted(dataSetSummary.getDeleted());
+        dto.setReset(dataSetSummary.getReset());
+        dto.setTimeOfLastModification(dataSetSummary.getTimeOfLastModification().getTime());
+        dto.setBatchId(dataSetSummary.getBatchId());
+
+        return dto;
     }
 
     public static RecordDTO recordToDTO(Record record) {

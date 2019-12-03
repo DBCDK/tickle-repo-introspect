@@ -393,8 +393,9 @@ class TickleRepoIntrospectGUI extends React.Component {
                                    fontFamily: 'Courier New',
                                    fontSize: FONT_SIZE + 'px',
                                    color: this.state.inputMode == INPUT_MODE.LOCALID_WITH_LOOKUP ? '#000000' : '#00aa00'
-                               }}/>
-                               &nbsp;:&nbsp;
+                               }}
+                               placeholder={'data sæt'}/>
+                        &nbsp;:&nbsp;
                         <input type="text"
                                value={this.state.localId}
                                onChange={this.handleLocalIdChange}

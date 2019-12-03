@@ -77,8 +77,7 @@ class TickleRepoIntrospectRecordViewer extends React.Component {
                                 showBlanks={this.props.showBlanks}
                                 handleShowBlanksChecked={this.props.handleShowBlanksChecked}
                                 isLineFormatSupported={this.props.isLineFormatSupported}
-                                isXmlFormatSupported={this.props.isXmlFormatSupported}
-                                recordIdWidth={this.props.recordIdWidth}/>
+                                isXmlFormatSupported={this.props.isXmlFormatSupported}/>
                         </div>
                     </div>
                 </div>

@@ -12,8 +12,13 @@ import queryString from 'query-string'
 const request = require('superagent');
 const LOCALID_WIDTH = 100;
 const DATASET_WIDTH = 300;
-const FONT_WIDTH_FACTOR = 10; // This is somewhat unprecise, adjust to fit the font in use
 const FONT_SIZE = 14;
+const FONT_WIDTH_FACTOR = 10; // This is somewhat unprecise, adjust to fit the font in use
+
+const INPUT_MODE = Object.freeze({
+    DATASET_THEN_LOCALID: 1,
+    LOCALID_WITH_LOOKUP:  2
+});
 
 class TickleRepoIntrospectGUI extends React.Component {
 
@@ -31,12 +36,13 @@ class TickleRepoIntrospectGUI extends React.Component {
             format: '',
             showBlanks: false,
             recordIdWidth: 0,
-            dataSetsForLocalId: []
+            dataSetsForLocalId: [],
+            inputMode: INPUT_MODE.LOCALID_WITH_LOOKUP
         };
 
         this.getInstance = this.getInstance.bind(this);
         this.getDatasets = this.getDatasets.bind(this);
-        this.getDatasetsByLocalId = this.getDatasetsByLocalId.bind(this);
+        this.getDataSetsByLocalId = this.getDataSetsByLocalId.bind(this);
         this.setNewRecordId = this.setNewRecordId.bind(this);
         this.getRecordFromRecordId = this.getRecordFromRecordId.bind(this);
 
@@ -47,7 +53,15 @@ class TickleRepoIntrospectGUI extends React.Component {
         this.handleShowBlanksChecked = this.handleShowBlanksChecked.bind(this);
         this.handleResetLinkClicked = this.handleResetLinkClicked.bind(this);
 
+        this.resetByEscapePress = this.resetByEscapePress.bind(this);
+
         this.localIdRef = React.createRef();
+    }
+
+    resetByEscapePress(event){
+        if(event.keyCode === 27) {
+            this.reset();
+        }
     }
 
     setInitialTab(tab) {
@@ -92,6 +106,13 @@ class TickleRepoIntrospectGUI extends React.Component {
                 });
             }
         }
+
+        // Add event listener for the escape key (clear dataset/localid)
+        document.addEventListener("keydown", this.resetByEscapePress, false);
+    }
+
+    componentWillUnmount(){
+        document.removeEventListener("keydown", this.resetByEscapePress, false);
     }
 
     redirectToUrlWithParams(tab, recordId) {
@@ -110,32 +131,69 @@ class TickleRepoIntrospectGUI extends React.Component {
 
     handleDataSetChange(event) {
         let parts = event.target.value.split(":");
+
+        // Scenario 1: We have a string with a colon, this is a complete dataset:localid = recordid
+        // - Move the localid name to the local id field
+        // - Lookup this record id (assuming its valid, otherwise the view becomes empty
+        // - Change inputmode so that no lookups is made when the local id changes
+        // - Change focus to the local id field
         if( parts.length == 2 ) {
             this.setState({
                 dataSet: parts[0],
-                localId: parts[1]
+                localId: parts[1],
+                inputMode: INPUT_MODE.DATASET_THEN_LOCALID
             });
             this.setNewRecordId(parts[0] + ":" + parts[1]);
             this.localIdRef.current.focus();
-        } else {
+        }
+
+        // Scenario 2: We have a value which is (part of) a dataset name
+        // Combine the value with the current value of the local id field and lookup this record
+        else if( event.target.value.length > 0) {
             this.setState({dataSet: event.target.value});
             this.setNewRecordId(event.target.value + ":" + this.state.localId);
+        }
+
+        // Scenario 3: The field is empty
+        // - Clear the view (by looking up a non-existing record)
+        // - Change inputmode so that dataset lookup is performed when changing the local id
+        // - Change focus to the local id field
+        else {
+            this.setState({
+                dataSet: '',
+                inputMode: INPUT_MODE.LOCALID_WITH_LOOKUP
+            });
+            this.setNewRecordId(event.target.value + ":" + this.state.localId);
+            this.localIdRef.current.focus();
         }
     }
 
     handleLocalIdChange(event) {
         let parts = event.target.value.split(":");
+
+        // Scenario 1: We have a string with a colon, this is a complete dataset:localid = recordid
+        // - Move the dataset name to the dataset field
+        // - Lookup this record
+        // - Change inputmode so no dataset lookups is made when the local id changes
         if( parts.length == 2 ) {
             this.setState({
                 dataSet: parts[0],
-                localId: parts[1]
+                localId: parts[1],
+                inputMode: INPUT_MODE.DATASET_THEN_LOCALID
             });
             this.setNewRecordId(parts[0] + ":" + parts[1]);
-        } else {
+        }
+
+        // Scenario 2: String (possibly empty) with a local id
+        // - If inputmode enables dataset lookup then:
+        //   - Lookup datasets for this localid (implicitly views the record, if it exists)
+        //   else:
+        //   - View the record but DO NOT lookup datasets
+        else {
             this.setState({localId: event.target.value});
 
-            if( this.state.dataSet == '' ) {
-                this.getDatasetsByLocalId(event.target.value);
+            if( this.state.inputMode == INPUT_MODE.LOCALID_WITH_LOOKUP ) {
+                this.getDataSetsByLocalId(event.target.value);
             } else {
                 this.setNewRecordId(this.state.dataSet + ":" + event.target.value);
             }
@@ -153,6 +211,14 @@ class TickleRepoIntrospectGUI extends React.Component {
     }
 
     handleResetLinkClicked(event) {
+        this.reset();
+
+        if( this.state.view == 'visning' ) {
+            event.preventDefault();
+        }
+    }
+
+    reset() {
         this.setState({
             localId: '',
             dataSet: '',
@@ -160,15 +226,12 @@ class TickleRepoIntrospectGUI extends React.Component {
             recordIdWidth: 0,
             record: null,
             format: '',
-            recordLoaded: false
+            recordLoaded: false,
+            inputMode: INPUT_MODE.LOCALID_WITH_LOOKUP
         });
 
+        this.localIdRef.current.focus();
         this.redirectToUrlWithParams(this.state.view, '');
-
-        if( this.state.view == 'visning' ) {
-            event.preventDefault();
-            this.localIdRef.current.focus();
-        }
     }
 
     getInstance() {
@@ -202,7 +265,7 @@ class TickleRepoIntrospectGUI extends React.Component {
             });
     }
 
-    getDatasetsByLocalId(localId) {
+    getDataSetsByLocalId(localId) {
         if( localId.length == 0) {
             return;
         }
@@ -211,15 +274,35 @@ class TickleRepoIntrospectGUI extends React.Component {
             .set('Accepts', 'application/json')
             .then(res => {
                 let dataSets = res.body.datasets !== undefined ? res.body.datasets : [];
+
+                // Scenario 1: Exactly one dataset matches the localid
+                // - Select this dataset and view the matching record
                 if( dataSets.length == 1 ) {
                     this.setState({
                         dataSet: dataSets[0].name
                     });
                     this.setNewRecordId(dataSets[0].name + ":" + localId);
-                } else if( dataSets.length > 1 ) {
-                    // Todo: combobox logic
-                    console.log("MULTIPLE datasets");
-                    console.log(dataSets);
+                }
+
+                // Scenario 2: More than one dataset matches the localid
+                // - Select the dataset with the lowest agency id and view the matching record
+                // - Todo: show that more dataset matches and make is possible to select another
+                else if( dataSets.length > 1 ) {
+                    dataSets.sort((a, b) => a.agencyId > b.agencyId ? 1 : -1);
+                    this.setState({
+                        dataSet: dataSets[0].name
+                    });
+                    this.setNewRecordId(dataSets[0].name + ":" + localId);
+                    // Todo: indicate somehow that more more datasets is available
+                }
+
+                // Scenario 3: No datasets matches the localid
+                // - Clear the dataset and the view (by viewing an nonexisting record)
+                else {
+                    this.setState({
+                        dataSet: ''
+                    });
+                    this.setNewRecordId('');
                 }
             })
             .catch(err => {
@@ -280,6 +363,12 @@ class TickleRepoIntrospectGUI extends React.Component {
                         recordId: ''
                     });
                 });
+        } else {
+            this.setState({
+                record: null,
+                recordLoaded: false,
+                recordId: ''
+            });
         }
     }
 
@@ -303,6 +392,7 @@ class TickleRepoIntrospectGUI extends React.Component {
                                        : this.state.dataSet.length * FONT_WIDTH_FACTOR,
                                    fontFamily: 'Courier New',
                                    fontSize: FONT_SIZE + 'px',
+                                   color: this.state.inputMode == INPUT_MODE.LOCALID_WITH_LOOKUP ? '#000000' : '#00aa00'
                                }}/>
                                &nbsp;:&nbsp;
                         <input type="text"
@@ -316,7 +406,8 @@ class TickleRepoIntrospectGUI extends React.Component {
                                    fontSize: FONT_SIZE + 'px'
                                }}
                                autoFocus
-                               ref={this.localIdRef}/>
+                               ref={this.localIdRef}
+                               placeholder={'lokal id'}/>
                     </label>
                     <h2><a href={this.getBaseUrl()} onClick={this.handleResetLinkClicked}>Tickle Repo</a> <b>{this.state.instance}</b> - {this.state.datasets == undefined ? 0 : this.state.datasets.length} kilder</h2>
                 </div>
@@ -338,8 +429,7 @@ class TickleRepoIntrospectGUI extends React.Component {
                                                 showBlanks={this.state.showBlanks}
                                                 handleShowBlanksChecked={this.handleShowBlanksChecked}
                                                 isLineFormatSupported={this.state.isLineFormatSupported}
-                                                isXmlFormatSupported={this.state.isXmlFormatSupported}
-                                                recordIdWidth={this.state.recordIdWidth}/>
+                                                isXmlFormatSupported={this.state.isXmlFormatSupported}/>
                         </Tab>
                     </Tabs>
                 </div>

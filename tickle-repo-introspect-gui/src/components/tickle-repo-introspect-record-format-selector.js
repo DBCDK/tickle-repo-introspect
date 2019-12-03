@@ -52,20 +52,17 @@ class TickleRepoIntrospectRecordFormatSelector extends React.Component {
                         </ToggleButtonGroup>
                         : ''
                     }
-                    {
-                        this.props.recordId.length > 0 ?
-                            <input value={this.props.recordId}
-                                   style={{
-                                       width: (this.props.recordId.length * FONT_WIDTH_FACTOR) + 'px',
-                                       position: 'relative',
-                                       top: '2px',
-                                       marginLeft: '50px',
-                                       fontFamily: 'Courier New',
-                                       fontSize: FONT_SIZE + 'px'
-                                   }}
-                                   readOnly={true}/>
-                            : ''
-                    }
+                    <span style={{
+                        marginLeft: '50px'
+                    }}>
+                        record id: <b>{this.props.recordId != '' ? this.props.recordId : '(ikke valgt)'}</b>
+                        &nbsp; &nbsp;
+                        {this.props.record != null
+                            ? <span style={{color: this.props.record.status == 'DELETED'
+                                    ? '#ff0000'
+                                    : '#008800'}}>{this.props.record.status}</span>
+                            : ''}
+                    </span>
                 </div>
             </div>
         )

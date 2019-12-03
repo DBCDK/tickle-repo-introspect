@@ -380,7 +380,7 @@ class TickleRepoIntrospectGUI extends React.Component {
     render() {
         return (
             <div style={{width: '100%', overflow: 'hidden'}}>
-                <div>
+                <div style={{marginBottom: '30px'}}>
                     <label className={'recordId-label'}
                            style={{marginLeft: '5px', marginRight: '20px', float: 'left'}}>
                         <input type="text"

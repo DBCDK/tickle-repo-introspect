@@ -52,15 +52,38 @@ class TickleRepoIntrospectGUI extends React.Component {
         this.handleChangeFormat = this.handleChangeFormat.bind(this);
         this.handleShowBlanksChecked = this.handleShowBlanksChecked.bind(this);
         this.handleResetLinkClicked = this.handleResetLinkClicked.bind(this);
+        this.handleDatasetSelected = this.handleDatasetSelected.bind(this);
 
-        this.resetByEscapePress = this.resetByEscapePress.bind(this);
+        this.handleKeyPress = this.handleKeyPress.bind(this);
 
         this.localIdRef = React.createRef();
     }
 
-    resetByEscapePress(event){
+    handleKeyPress(event){
+
+        // Escape: reset all fields
         if(event.keyCode === 27) {
             this.reset();
+        }
+
+        // Arrow up-down: Select a dataset when  multiple sets are available
+        if(event.keyCode === 38 || event.keyCode === 40) { // up-down
+            if( this.state.dataSetsForLocalId.length > 0 ) {
+                let curr = this.state.dataSetsForLocalId.indexOf(this.state.dataSet);
+                if( event.keyCode === 38 && curr > 0 ) {
+                    this.setState({dataSet: this.state.dataSetsForLocalId[curr - 1]});
+                    this.setNewRecordId(this.state.dataSet + ':' + this.state.localId);
+                }
+                if( event.keyCode === 40 && curr < this.state.dataSetsForLocalId.length - 1 ) {
+                    this.setState({dataSet: this.state.dataSetsForLocalId[curr + 1]});
+                    this.setNewRecordId(this.state.dataSet + ':' + this.state.localId);
+                }
+            }
+        }
+
+        // enter: Close select div for multiple datasets
+        if(event.keyCode === 13) {
+            this.setState({dataSetsForLocalId: []});
         }
     }
 
@@ -108,11 +131,11 @@ class TickleRepoIntrospectGUI extends React.Component {
         }
 
         // Add event listener for the escape key (clear dataset/localid)
-        document.addEventListener("keydown", this.resetByEscapePress, false);
+        document.addEventListener("keydown", this.handleKeyPress, false);
     }
 
     componentWillUnmount(){
-        document.removeEventListener("keydown", this.resetByEscapePress, false);
+        document.removeEventListener("keydown", this.handleKeyPress, false);
     }
 
     redirectToUrlWithParams(tab, recordId) {
@@ -218,6 +241,13 @@ class TickleRepoIntrospectGUI extends React.Component {
         }
     }
 
+    handleDatasetSelected(name) {
+        this.setState({
+            dataSet: name,
+            dataSetsForLocalId: []
+        })
+    }
+
     reset() {
         this.setState({
             localId: '',
@@ -227,7 +257,8 @@ class TickleRepoIntrospectGUI extends React.Component {
             record: null,
             format: '',
             recordLoaded: false,
-            inputMode: INPUT_MODE.LOCALID_WITH_LOOKUP
+            inputMode: INPUT_MODE.LOCALID_WITH_LOOKUP,
+            dataSetsForLocalId: []
         });
 
         this.localIdRef.current.focus();
@@ -279,28 +310,29 @@ class TickleRepoIntrospectGUI extends React.Component {
                 // - Select this dataset and view the matching record
                 if( dataSets.length == 1 ) {
                     this.setState({
-                        dataSet: dataSets[0].name
+                        dataSet: dataSets[0].name,
+                        dataSetsForLocalId: []
                     });
                     this.setNewRecordId(dataSets[0].name + ":" + localId);
                 }
 
                 // Scenario 2: More than one dataset matches the localid
                 // - Select the dataset with the lowest agency id and view the matching record
-                // - Todo: show that more dataset matches and make is possible to select another
                 else if( dataSets.length > 1 ) {
                     dataSets.sort((a, b) => a.agencyId > b.agencyId ? 1 : -1);
                     this.setState({
-                        dataSet: dataSets[0].name
+                        dataSet: dataSets[0].name,
+                        dataSetsForLocalId: dataSets.map(s => s.name)
                     });
                     this.setNewRecordId(dataSets[0].name + ":" + localId);
-                    // Todo: indicate somehow that more more datasets is available
                 }
 
                 // Scenario 3: No datasets matches the localid
                 // - Clear the dataset and the view (by viewing an nonexisting record)
                 else {
                     this.setState({
-                        dataSet: ''
+                        dataSet: '',
+                        dataSetsForLocalId: []
                     });
                     this.setNewRecordId('');
                 }
@@ -388,8 +420,8 @@ class TickleRepoIntrospectGUI extends React.Component {
                                onChange={this.handleDataSetChange}
                                style={{
                                    width: this.state.dataSet.length < 10
-                                       ? 10 * FONT_WIDTH_FACTOR
-                                       : this.state.dataSet.length * FONT_WIDTH_FACTOR,
+                                   ? 10 * FONT_WIDTH_FACTOR
+                                   : this.state.dataSet.length * FONT_WIDTH_FACTOR,
                                    fontFamily: 'Courier New',
                                    fontSize: FONT_SIZE + 'px',
                                    color: this.state.inputMode == INPUT_MODE.LOCALID_WITH_LOOKUP ? '#000000' : '#00aa00'
@@ -411,6 +443,29 @@ class TickleRepoIntrospectGUI extends React.Component {
                                placeholder={'lokal id'}/>
                     </label>
                     <h2><a href={this.getBaseUrl()} onClick={this.handleResetLinkClicked}>Tickle Repo</a> <b>{this.state.instance}</b> - {this.state.datasets == undefined ? 0 : this.state.datasets.length} kilder</h2>
+                </div>
+                <div style={{
+                        border: 'solid 1px #cccccc',
+                        width: this.state.dataSet.length < 10
+                        ? 10 * FONT_WIDTH_FACTOR
+                        : Math.max(...this.state.dataSetsForLocalId.map(name => name.length)) * FONT_WIDTH_FACTOR,
+                        position: 'relative',
+                        top: '-29px',
+                        left: '5px',
+                        visibility: this.state.dataSetsForLocalId.length > 0 ? 'visible' : 'hidden'}}>
+                    {this.state.dataSetsForLocalId.map((name, index) =>
+                        <div key={index}>
+                            <a style={{
+                                   marginRight: '10px',
+                                   marginLeft: '5px',
+                                   fontWeight: this.state.dataSet == name ? 'bold' : 'normal',
+                                   cursor: 'pointer',
+                                   fontFamily: 'Courier New',
+                                   fontSize: FONT_SIZE + 'px'
+                               }}
+                               onClick={() => { this.handleDatasetSelected(name)}}
+                            key={index}>{name}</a>
+                        </div>)}
                 </div>
                 <div>
                     <Tabs activeKey={this.state.view}

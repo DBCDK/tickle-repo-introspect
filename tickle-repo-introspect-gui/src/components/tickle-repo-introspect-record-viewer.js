@@ -5,6 +5,7 @@
 
 import React from "react";
 import RawrepoIntrospectRecordFormatSelector from './tickle-repo-introspect-record-format-selector';
+import { dateFormatter } from './tickle-repo-introspect-date-formatter'
 
 const HEIGHT_OFFSET = 190;
 const LINE_HEIGHT = 22;
@@ -62,7 +63,6 @@ class TickleRepoIntrospectRecordViewer extends React.Component {
 
     render() {
         return (
-
             <div>
                 <div style={{width: '100%', overflow: 'hidden'}}>
                     <div className='form-group' style={{height: '28px'}}>
@@ -81,6 +81,19 @@ class TickleRepoIntrospectRecordViewer extends React.Component {
                         </div>
                     </div>
                 </div>
+                {
+                    this.props.record != null ?
+                    <div>
+                        Created: <b>{dateFormatter(this.props.record.timeOfCreation)}</b>
+                        &nbsp; &nbsp;
+                        Modified: <b>{dateFormatter(this.props.record.timeOfLastModification)}</b>
+                        &nbsp; &nbsp;
+                        Sidste batch: <b>{this.props.record.batch}</b>
+                        &nbsp; &nbsp;
+                        Tracking ID: <b>{this.props.record.trackingId}</b>
+                    </div>
+                    : ''
+                }
                 <div className="flex-container">
                     <textarea value={ this.getRecordForSelectedFormat() }
                               readOnly={true}

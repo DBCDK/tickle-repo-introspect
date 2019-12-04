@@ -90,7 +90,7 @@ pipeline {
             steps {
                 script {
                     sh """  
-                        set-new-version services/tickle-repo-introspect.yml ${env.GITLAB_PRIVATE_TOKEN} metascrum/tickle-repo-introspect-secrets ${DOCKER_IMAGE_DIT_VERSION} -b metascrum-prod
+                        set-new-version services/tickle-repo-introspect.yml ${env.GITLAB_PRIVATE_TOKEN} metascrum/tickle-repo-introspect-secrets ${DOCKER_IMAGE_DIT_VERSION} -b metascrum-staging
                     """
                 }
             }

@@ -211,7 +211,6 @@ class TickleRepoIntrospectGUI extends React.Component {
 
             // Check for empty string, if found then just clear the screen and reset all modes
             if( event.target.value.length == 0 ) {
-                console.log("empty");
                 this.setState({
                     dataSet: '',
                     localId: '',

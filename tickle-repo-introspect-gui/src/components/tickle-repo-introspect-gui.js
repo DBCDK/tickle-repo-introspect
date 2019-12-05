@@ -8,17 +8,8 @@ import {Tab, Tabs} from "react-bootstrap";
 import DataSetSummaryList from "./tickle-repo-introspect-dataset-summary-list";
 import TickleRecordViewer from "./tickle-repo-introspect-record-viewer";
 import queryString from 'query-string'
-
+import * as Constants from './tickle-repo-introspect-constants';
 const request = require('superagent');
-const LOCALID_WIDTH = 100;
-const DATASET_WIDTH = 300;
-const FONT_SIZE = 14;
-const FONT_WIDTH_FACTOR = 10; // This is somewhat unprecise, adjust to fit the font in use
-
-const INPUT_MODE = Object.freeze({
-    DATASET_THEN_LOCALID: 1,
-    LOCALID_WITH_LOOKUP:  2
-});
 
 class TickleRepoIntrospectGUI extends React.Component {
 
@@ -37,7 +28,7 @@ class TickleRepoIntrospectGUI extends React.Component {
             showBlanks: false,
             recordIdWidth: 0,
             dataSetsForLocalId: [],
-            inputMode: INPUT_MODE.LOCALID_WITH_LOOKUP
+            inputMode: Constants.INPUT_MODE.LOCALID_WITH_LOOKUP
         };
 
         this.getInstance = this.getInstance.bind(this);
@@ -166,7 +157,7 @@ class TickleRepoIntrospectGUI extends React.Component {
             this.setState({
                 dataSet: parts[0],
                 localId: parts[1],
-                inputMode: INPUT_MODE.DATASET_THEN_LOCALID
+                inputMode: Constants.INPUT_MODE.DATASET_THEN_LOCALID
             });
             this.setNewRecordId(parts[0] + ":" + parts[1]);
             this.localIdRef.current.focus();
@@ -186,7 +177,7 @@ class TickleRepoIntrospectGUI extends React.Component {
         else {
             this.setState({
                 dataSet: '',
-                inputMode: INPUT_MODE.LOCALID_WITH_LOOKUP
+                inputMode: Constants.INPUT_MODE.LOCALID_WITH_LOOKUP
             });
             this.setNewRecordId(event.target.value + ":" + this.state.localId);
             this.localIdRef.current.focus();
@@ -204,7 +195,7 @@ class TickleRepoIntrospectGUI extends React.Component {
             this.setState({
                 dataSet: parts[0],
                 localId: parts[1],
-                inputMode: INPUT_MODE.DATASET_THEN_LOCALID,
+                inputMode: Constants.INPUT_MODE.DATASET_THEN_LOCALID,
                 datasetForLocalId: []
             });
             this.setNewRecordId(parts[0] + ":" + parts[1]);
@@ -224,12 +215,12 @@ class TickleRepoIntrospectGUI extends React.Component {
                 this.setState({
                     dataSet: '',
                     localId: '',
-                    inputMode: INPUT_MODE.LOCALID_WITH_LOOKUP,
+                    inputMode: Constants.INPUT_MODE.LOCALID_WITH_LOOKUP,
                     dataSetsForLocalId: []
                 });
                 this.setNewRecordId(":");
             } else {
-                if (this.state.inputMode == INPUT_MODE.LOCALID_WITH_LOOKUP) {
+                if (this.state.inputMode == Constants.INPUT_MODE.LOCALID_WITH_LOOKUP) {
                     this.getDataSetsByLocalId(event.target.value);
                 } else {
                     this.setNewRecordId(this.state.dataSet + ":" + event.target.value);
@@ -272,7 +263,7 @@ class TickleRepoIntrospectGUI extends React.Component {
             record: null,
             format: '',
             recordLoaded: false,
-            inputMode: INPUT_MODE.LOCALID_WITH_LOOKUP,
+            inputMode: Constants.INPUT_MODE.LOCALID_WITH_LOOKUP,
             dataSetsForLocalId: []
         });
 
@@ -436,14 +427,14 @@ class TickleRepoIntrospectGUI extends React.Component {
                                onChange={this.handleDataSetChange}
                                style={{
                                    width: this.state.dataSet.length < 10
-                                   ? 10 * FONT_WIDTH_FACTOR
+                                   ? 10 * Constants.FONT_WIDTH_FACTOR
                                    : (this.state.dataSetsForLocalId.length > 0
-                                           ? Math.max(...this.state.dataSetsForLocalId.map(name => name.length)) * FONT_WIDTH_FACTOR
-                                           : this.state.dataSet.length * FONT_WIDTH_FACTOR
+                                           ? Math.max(...this.state.dataSetsForLocalId.map(name => name.length)) * Constants.FONT_WIDTH_FACTOR
+                                           : this.state.dataSet.length * Constants.FONT_WIDTH_FACTOR
                                    ),
                                    fontFamily: 'Courier New',
-                                   fontSize: FONT_SIZE + 'px',
-                                   color: this.state.inputMode == INPUT_MODE.LOCALID_WITH_LOOKUP ? '#000000' : '#00aa00'
+                                   fontSize: Constants.FONT_SIZE + 'px',
+                                   color: this.state.inputMode == Constants.INPUT_MODE.LOCALID_WITH_LOOKUP ? '#000000' : '#00aa00'
                                }}
                                placeholder={'data sæt'}/>
                         &nbsp;:&nbsp;
@@ -452,10 +443,10 @@ class TickleRepoIntrospectGUI extends React.Component {
                                onChange={this.handleLocalIdChange}
                                style={{
                                    width: this.state.localId.length < 10
-                                   ? 10 * FONT_WIDTH_FACTOR
-                                   : this.state.localId.length * FONT_WIDTH_FACTOR,
+                                   ? 10 * Constants.FONT_WIDTH_FACTOR
+                                   : this.state.localId.length * Constants.FONT_WIDTH_FACTOR,
                                    fontFamily: 'Courier New',
-                                   fontSize: FONT_SIZE + 'px'
+                                   fontSize: Constants.FONT_SIZE + 'px'
                                }}
                                autoFocus
                                ref={this.localIdRef}
@@ -467,8 +458,8 @@ class TickleRepoIntrospectGUI extends React.Component {
                         border: 'solid 2px #bbbbbb',
                         borderRadius: '3px',
                         width: this.state.dataSet.length < 10
-                        ? 10 * FONT_WIDTH_FACTOR
-                        : Math.max(...this.state.dataSetsForLocalId.map(name => name.length)) * FONT_WIDTH_FACTOR,
+                        ? 10 * Constants.FONT_WIDTH_FACTOR
+                        : Math.max(...this.state.dataSetsForLocalId.map(name => name.length)) * Constants.FONT_WIDTH_FACTOR,
                         position: 'fixed',
                         top: '62px',
                         left: '5px',
@@ -487,7 +478,7 @@ class TickleRepoIntrospectGUI extends React.Component {
                                    fontWeight: this.state.dataSet == name ? 'bold' : 'normal',
                                    cursor: 'pointer',
                                    fontFamily: 'Courier New',
-                                   fontSize: FONT_SIZE + 'px',
+                                   fontSize: Constants.FONT_SIZE + 'px',
                                 color: '#333333'
                                }}
                                onClick={() => { this.handleDatasetSelected(name)}}

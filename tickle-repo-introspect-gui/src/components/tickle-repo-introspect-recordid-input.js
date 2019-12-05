@@ -76,9 +76,9 @@ class TickleRepoIntrospectRecordIdInput extends React.Component {
             }}>
                 <u>escape</u>: Nulstil siden
                 &nbsp; &nbsp;
-                <u>pil op/ned</u>: Vælg dataset
+                <u>pil op/ned</u>: Vælg datasæt
                 &nbsp; &nbsp;
-                <u>enter</u>: Vælg og luk datasetvælger
+                <u>enter</u>: Vælg og luk datasætvælger
             </div>
             <TickleRepoIntrospectDataSetList dataSetsForLocalId={this.props.dataSetsForLocalId}
                                              dataSet={this.props.dataSet}

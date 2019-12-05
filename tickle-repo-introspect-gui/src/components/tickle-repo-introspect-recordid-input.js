@@ -4,12 +4,15 @@
  */
 
 import React from "react";
+import TickleRepoIntrospectDataSetList from "./tickle-repo-introspect-dataset-list";
 import * as Constants from './tickle-repo-introspect-constants';
 
 class TickleRepoIntrospectRecordIdInput extends React.Component {
 
     constructor(props) {
         super(props);
+
+        this.getWidthOfDataSetField = this.getWidthOfDataSetField.bind(this);
     }
 
     getWidthOfDataSetField() {
@@ -32,6 +35,12 @@ class TickleRepoIntrospectRecordIdInput extends React.Component {
         return this.props.localId.length * Constants.FONT_WIDTH_FACTOR
     }
 
+    getLocalIdColor() {
+        return this.props.inputMode == Constants.INPUT_MODE.LOCALID_WITH_LOOKUP
+            ? '#000000'
+            : '#00aa00'
+    }
+
     render() {
         return(
             <div>
@@ -44,7 +53,7 @@ class TickleRepoIntrospectRecordIdInput extends React.Component {
                            width: this.getWidthOfDataSetField(),
                            fontFamily: 'Courier New',
                            fontSize: Constants.FONT_SIZE + 'px',
-                           color: this.props.inputMode == Constants.INPUT_MODE.LOCALID_WITH_LOOKUP ? '#000000' : '#00aa00'
+                           color: this.getLocalIdColor()
                        }}
                        placeholder={'data sæt'}/>
                 &nbsp;:&nbsp;
@@ -62,34 +71,18 @@ class TickleRepoIntrospectRecordIdInput extends React.Component {
                        onKeyDown={this.props.handleLocalIdKeyPress}/>
             </label>
             <div style={{
-                        border: 'solid 2px #bbbbbb',
-                        borderRadius: '3px',
-                        width: this.getWidthOfDataSetField(),
-                        position: 'fixed',
-                        top: '62px',
-                        left: '5px',
-                        visibility: this.props.dataSetsForLocalId.length > 0 ? 'visible' : 'hidden',
-                        display:'block',
-                        zIndex:'2',
-                        paddingLeft: '3px',
-                        paddingTop: '5px',
-                        backgroundColor: 'rgba(255, 255, 255, 1)'
-                }}>
-                    {this.props.dataSetsForLocalId.map((name, index) =>
-                        <div key={index}>
-                            <a style={{
-                                   marginRight: '10px',
-                                   marginLeft: '5px',
-                                   fontWeight: this.props.dataSet == name ? 'bold' : 'normal',
-                                   cursor: 'pointer',
-                                   fontFamily: 'Courier New',
-                                   fontSize: Constants.FONT_SIZE + 'px',
-                                color: '#333333'
-                               }}
-                               onClick={() => { this.handleDatasetSelected(name)}}
-                            key={index}>{name}</a>
-                        </div>)}
-                </div>
+                paddingTop: '5px',
+                fontSize: 'smaller'
+            }}>
+                <u>escape</u>: Nulstil siden
+                &nbsp; &nbsp;
+                <u>pil op/ned</u>: Vælg dataset
+                &nbsp; &nbsp;
+                <u>enter</u>: Vælg og luk datasetvælger
+            </div>
+            <TickleRepoIntrospectDataSetList dataSetsForLocalId={this.props.dataSetsForLocalId}
+                                             dataSet={this.props.dataSet}
+                                             getWidthOfDataSetField={this.getWidthOfDataSetField}/>
             </div>
         );
     }

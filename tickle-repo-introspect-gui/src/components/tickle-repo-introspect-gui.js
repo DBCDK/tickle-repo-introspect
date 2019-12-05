@@ -419,7 +419,7 @@ class TickleRepoIntrospectGUI extends React.Component {
         return (
             <div style={{width: '100%', overflow: 'hidden'}}>
                 <h2><a href={this.getBaseUrl()} onClick={this.handleResetLinkClicked}>Tickle Repo</a> <b>{this.state.instance}</b> - {this.state.datasets == undefined ? 0 : this.state.datasets.length} kilder</h2>
-                <div style={{marginBottom: '30px'}}>
+                <div style={{marginBottom: '60px'}}>
                     <TickleRepoIntrospectRecordIdInput dataSet={this.state.dataSet}
                                                        dataSetsForLocalId={this.state.dataSetsForLocalId}
                                                        localId={this.state.localId}
@@ -427,7 +427,9 @@ class TickleRepoIntrospectGUI extends React.Component {
                                                        handleLocalIdChange={this.handleLocalIdChange}
                                                        handle={this.handleLocalIdKeyPress}
                                                        localIdRef={this.localIdRef}
-                                                       handleLocalIdKeyPress={this.handleLocalIdKeyPress}/>
+                                                       handleLocalIdKeyPress={this.handleLocalIdKeyPress}
+                                                       handleDataSetChange={this.handleDataSetChange}
+                                                       inputMode={this.state.inputMode}/>
                 </div>
                 <div>
                     <Tabs activeKey={this.state.view}

@@ -6,7 +6,8 @@
 import React from "react";
 import {Tab, Tabs} from "react-bootstrap";
 import DataSetSummaryList from "./tickle-repo-introspect-dataset-summary-list";
-import TickleRecordViewer from "./tickle-repo-introspect-record-viewer";
+import TickleRepoIntrospectRecordViewer from "./tickle-repo-introspect-record-viewer";
+import TickleRepoIntrospectRecordIdInput from "./tickle-repo-introspect-recordid-input";
 import queryString from 'query-string'
 import * as Constants from './tickle-repo-introspect-constants';
 const request = require('superagent');
@@ -419,70 +420,14 @@ class TickleRepoIntrospectGUI extends React.Component {
             <div style={{width: '100%', overflow: 'hidden'}}>
                 <h2><a href={this.getBaseUrl()} onClick={this.handleResetLinkClicked}>Tickle Repo</a> <b>{this.state.instance}</b> - {this.state.datasets == undefined ? 0 : this.state.datasets.length} kilder</h2>
                 <div style={{marginBottom: '30px'}}>
-                    <label className={'recordId-label'}
-                           style={{marginLeft: '5px', marginRight: '20px', float: 'left'}}>
-                        <input type="text"
-                               value={this.state.dataSet}
-                               onChange={this.handleDataSetChange}
-                               style={{
-                                   width: this.state.dataSet.length < 10
-                                   ? 10 * Constants.FONT_WIDTH_FACTOR
-                                   : (this.state.dataSetsForLocalId.length > 0
-                                           ? Math.max(...this.state.dataSetsForLocalId.map(name => name.length)) * Constants.FONT_WIDTH_FACTOR
-                                           : this.state.dataSet.length * Constants.FONT_WIDTH_FACTOR
-                                   ),
-                                   fontFamily: 'Courier New',
-                                   fontSize: Constants.FONT_SIZE + 'px',
-                                   color: this.state.inputMode == Constants.INPUT_MODE.LOCALID_WITH_LOOKUP ? '#000000' : '#00aa00'
-                               }}
-                               placeholder={'data sæt'}/>
-                        &nbsp;:&nbsp;
-                        <input type="text"
-                               value={this.state.localId}
-                               onChange={this.handleLocalIdChange}
-                               style={{
-                                   width: this.state.localId.length < 10
-                                   ? 10 * Constants.FONT_WIDTH_FACTOR
-                                   : this.state.localId.length * Constants.FONT_WIDTH_FACTOR,
-                                   fontFamily: 'Courier New',
-                                   fontSize: Constants.FONT_SIZE + 'px'
-                               }}
-                               autoFocus
-                               ref={this.localIdRef}
-                               placeholder={'lokal id'}
-                               onKeyDown={this.handleLocalIdKeyPress}/>
-                    </label>
-                </div>
-                <div style={{
-                        border: 'solid 2px #bbbbbb',
-                        borderRadius: '3px',
-                        width: this.state.dataSet.length < 10
-                        ? 10 * Constants.FONT_WIDTH_FACTOR
-                        : Math.max(...this.state.dataSetsForLocalId.map(name => name.length)) * Constants.FONT_WIDTH_FACTOR,
-                        position: 'fixed',
-                        top: '62px',
-                        left: '5px',
-                        visibility: this.state.dataSetsForLocalId.length > 0 ? 'visible' : 'hidden',
-                        display:'block',
-                        zIndex:'2',
-                        paddingLeft: '3px',
-                        paddingTop: '5px',
-                        backgroundColor: 'rgba(255, 255, 255, 1)'
-                }}>
-                    {this.state.dataSetsForLocalId.map((name, index) =>
-                        <div key={index}>
-                            <a style={{
-                                   marginRight: '10px',
-                                   marginLeft: '5px',
-                                   fontWeight: this.state.dataSet == name ? 'bold' : 'normal',
-                                   cursor: 'pointer',
-                                   fontFamily: 'Courier New',
-                                   fontSize: Constants.FONT_SIZE + 'px',
-                                color: '#333333'
-                               }}
-                               onClick={() => { this.handleDatasetSelected(name)}}
-                            key={index}>{name}</a>
-                        </div>)}
+                    <TickleRepoIntrospectRecordIdInput dataSet={this.state.dataSet}
+                                                       dataSetsForLocalId={this.state.dataSetsForLocalId}
+                                                       localId={this.state.localId}
+                                                       handleDatasetChange={this.handleDataSetChange}
+                                                       handleLocalIdChange={this.handleLocalIdChange}
+                                                       handle={this.handleLocalIdKeyPress}
+                                                       localIdRef={this.localIdRef}
+                                                       handleLocalIdKeyPress={this.handleLocalIdKeyPress}/>
                 </div>
                 <div>
                     <Tabs activeKey={this.state.view}
@@ -493,7 +438,7 @@ class TickleRepoIntrospectGUI extends React.Component {
                             <DataSetSummaryList datasets={this.state.datasets}/>
                         </Tab>
                         <Tab eventKey={'visning'} title="Visning" style={{margin: '10px'}}>
-                            <TickleRecordViewer record={this.state.record}
+                            <TickleRepoIntrospectRecordViewer record={this.state.record}
                                                 recordId={this.state.recordId}
                                                 recordLoaded={this.state.recordLoaded}
                                                 format={this.state.format}

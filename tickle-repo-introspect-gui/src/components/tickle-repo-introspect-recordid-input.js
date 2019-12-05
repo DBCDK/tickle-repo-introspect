@@ -12,6 +12,26 @@ class TickleRepoIntrospectRecordIdInput extends React.Component {
         super(props);
     }
 
+    getWidthOfDataSetField() {
+        if( this.props.dataSet.length < 10 ) {
+            return 10 * Constants.FONT_WIDTH_FACTOR;
+        }
+
+        if( this.props.dataSetsForLocalId.length > 1 ) {
+            return Math.max(...this.props.dataSetsForLocalId.map(name => name.length)) * Constants.FONT_WIDTH_FACTOR;
+        } else {
+            return this.props.dataSet.length * Constants.FONT_WIDTH_FACTOR
+        }
+    }
+
+    getWidthOfLocalidField() {
+        if( this.props.localId.length < 10 ) {
+            return 10 * Constants.FONT_WIDTH_FACTOR;
+        }
+
+        return this.props.localId.length * Constants.FONT_WIDTH_FACTOR
+    }
+
     render() {
         return(
             <div>
@@ -21,12 +41,7 @@ class TickleRepoIntrospectRecordIdInput extends React.Component {
                        value={this.props.dataSet}
                        onChange={this.props.handleDataSetChange}
                        style={{
-                           width: this.props.dataSet.length < 10
-                               ? 10 * Constants.FONT_WIDTH_FACTOR
-                               : (this.props.dataSetsForLocalId.length > 0
-                                       ? Math.max(...this.props.dataSetsForLocalId.map(name => name.length)) * Constants.FONT_WIDTH_FACTOR
-                                       : this.props.dataSet.length * Constants.FONT_WIDTH_FACTOR
-                               ),
+                           width: this.getWidthOfDataSetField(),
                            fontFamily: 'Courier New',
                            fontSize: Constants.FONT_SIZE + 'px',
                            color: this.props.inputMode == Constants.INPUT_MODE.LOCALID_WITH_LOOKUP ? '#000000' : '#00aa00'
@@ -37,9 +52,7 @@ class TickleRepoIntrospectRecordIdInput extends React.Component {
                        value={this.props.localId}
                        onChange={this.props.handleLocalIdChange}
                        style={{
-                           width: this.props.localId.length < 10
-                               ? 10 * Constants.FONT_WIDTH_FACTOR
-                               : this.props.localId.length * Constants.FONT_WIDTH_FACTOR,
+                           width: this.getWidthOfLocalidField(),
                            fontFamily: 'Courier New',
                            fontSize: Constants.FONT_SIZE + 'px'
                        }}
@@ -51,9 +64,7 @@ class TickleRepoIntrospectRecordIdInput extends React.Component {
             <div style={{
                         border: 'solid 2px #bbbbbb',
                         borderRadius: '3px',
-                        width: this.props.dataSet.length < 10
-                        ? 10 * Constants.FONT_WIDTH_FACTOR
-                        : Math.max(...this.props.dataSetsForLocalId.map(name => name.length)) * Constants.FONT_WIDTH_FACTOR,
+                        width: this.getWidthOfDataSetField(),
                         position: 'fixed',
                         top: '62px',
                         left: '5px',

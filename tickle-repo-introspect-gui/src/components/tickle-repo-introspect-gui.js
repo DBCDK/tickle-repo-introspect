@@ -412,6 +412,7 @@ class TickleRepoIntrospectGUI extends React.Component {
     render() {
         return (
             <div style={{width: '100%', overflow: 'hidden'}}>
+                <h2><a href={this.getBaseUrl()} onClick={this.handleResetLinkClicked}>Tickle Repo</a> <b>{this.state.instance}</b> - {this.state.datasets == undefined ? 0 : this.state.datasets.length} kilder</h2>
                 <div style={{marginBottom: '30px'}}>
                     <label className={'recordId-label'}
                            style={{marginLeft: '5px', marginRight: '20px', float: 'left'}}>
@@ -421,7 +422,10 @@ class TickleRepoIntrospectGUI extends React.Component {
                                style={{
                                    width: this.state.dataSet.length < 10
                                    ? 10 * FONT_WIDTH_FACTOR
-                                   : this.state.dataSet.length * FONT_WIDTH_FACTOR,
+                                   : (this.state.dataSetsForLocalId.length > 0
+                                           ? Math.max(...this.state.dataSetsForLocalId.map(name => name.length)) * FONT_WIDTH_FACTOR
+                                           : this.state.dataSet.length * FONT_WIDTH_FACTOR
+                                   ),
                                    fontFamily: 'Courier New',
                                    fontSize: FONT_SIZE + 'px',
                                    color: this.state.inputMode == INPUT_MODE.LOCALID_WITH_LOOKUP ? '#000000' : '#00aa00'
@@ -442,17 +446,23 @@ class TickleRepoIntrospectGUI extends React.Component {
                                ref={this.localIdRef}
                                placeholder={'lokal id'}/>
                     </label>
-                    <h2><a href={this.getBaseUrl()} onClick={this.handleResetLinkClicked}>Tickle Repo</a> <b>{this.state.instance}</b> - {this.state.datasets == undefined ? 0 : this.state.datasets.length} kilder</h2>
                 </div>
                 <div style={{
-                        border: 'solid 1px #cccccc',
+                        border: 'solid 2px #bbbbbb',
+                        borderRadius: '3px',
                         width: this.state.dataSet.length < 10
                         ? 10 * FONT_WIDTH_FACTOR
                         : Math.max(...this.state.dataSetsForLocalId.map(name => name.length)) * FONT_WIDTH_FACTOR,
-                        position: 'relative',
-                        top: '-29px',
+                        position: 'fixed',
+                        top: '62px',
                         left: '5px',
-                        visibility: this.state.dataSetsForLocalId.length > 0 ? 'visible' : 'hidden'}}>
+                        visibility: this.state.dataSetsForLocalId.length > 0 ? 'visible' : 'hidden',
+                        display:'block',
+                        zIndex:'2',
+                        paddingLeft: '3px',
+                        paddingTop: '5px',
+                        backgroundColor: 'rgba(245, 245, 245, 1)'
+                }}>
                     {this.state.dataSetsForLocalId.map((name, index) =>
                         <div key={index}>
                             <a style={{
@@ -461,7 +471,8 @@ class TickleRepoIntrospectGUI extends React.Component {
                                    fontWeight: this.state.dataSet == name ? 'bold' : 'normal',
                                    cursor: 'pointer',
                                    fontFamily: 'Courier New',
-                                   fontSize: FONT_SIZE + 'px'
+                                   fontSize: FONT_SIZE + 'px',
+                                color: '#333333'
                                }}
                                onClick={() => { this.handleDatasetSelected(name)}}
                             key={index}>{name}</a>

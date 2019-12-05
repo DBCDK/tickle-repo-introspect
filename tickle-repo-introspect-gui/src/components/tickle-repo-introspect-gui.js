@@ -143,7 +143,7 @@ class TickleRepoIntrospectGUI extends React.Component {
 
     handleTabSelect(view) {
         this.setState({view: view});
-        this.redirectToUrlWithParams(view);
+        this.redirectToUrlWithParams(view, this.state.recordId);
     }
 
     handleDataSetChange(event) {

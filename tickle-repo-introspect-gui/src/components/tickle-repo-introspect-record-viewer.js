@@ -6,11 +6,7 @@
 import React from "react";
 import RawrepoIntrospectRecordFormatSelector from './tickle-repo-introspect-record-format-selector';
 import { dateFormatter } from './tickle-repo-introspect-date-formatter'
-
-const HEIGHT_OFFSET = 190;
-const LINE_HEIGHT = 22;
-const FONT_SIZE = 14;
-const request = require('superagent');
+import * as Constants from './tickle-repo-introspect-constants';
 
 class TickleRepoIntrospectRecordViewer extends React.Component {
 
@@ -31,7 +27,7 @@ class TickleRepoIntrospectRecordViewer extends React.Component {
     };
 
     availableRows() {
-        let availableHeight = Math.round((window.innerHeight - HEIGHT_OFFSET) / LINE_HEIGHT);
+        let availableHeight = Math.round((window.innerHeight - Constants.VIEW_HEIGHT_OFFSET) / Constants.VIEW_LINE_HEIGHT);
         return availableHeight < 3 ? 3 : availableHeight;
     }
 
@@ -100,9 +96,9 @@ class TickleRepoIntrospectRecordViewer extends React.Component {
                               style={{
                                   width: '100%',
                                   fontFamily: 'Courier New',
-                                  fontSize: FONT_SIZE + 'px',
+                                  fontSize: Constants.VIEW_FONT_SIZE + 'px',
                                   fontWeight: '500',
-                                  lineHeight: LINE_HEIGHT + 'px',
+                                  lineHeight: Constants.VIEW_LINE_HEIGHT + 'px',
                                   resize: 'none',
                                   backgroundColor: '#ffffff',
                                   color: this.props.textColor,

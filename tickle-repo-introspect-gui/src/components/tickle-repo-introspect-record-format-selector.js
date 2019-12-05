@@ -6,9 +6,6 @@
 import React from "react";
 import {Button, ButtonGroup, ToggleButtonGroup, ToggleButton} from "react-bootstrap";
 
-const FONT_SIZE = 14;
-const FONT_WIDTH_FACTOR = 10; // This is somewhat unprecise, adjust to fit the font in use
-
 class TickleRepoIntrospectRecordFormatSelector extends React.Component {
 
     constructor(props) {

@@ -5,7 +5,7 @@
 
 import React from "react";
 
-export const VIEW_HEIGHT_OFFSET = 190;
+export const VIEW_HEIGHT_OFFSET = 280;
 export const VIEW_LINE_HEIGHT = 22;
 export const FONT_SIZE = 14;
 export const FONT_WIDTH_FACTOR = 10; // This is somewhat unprecise, adjust to fit the font in use

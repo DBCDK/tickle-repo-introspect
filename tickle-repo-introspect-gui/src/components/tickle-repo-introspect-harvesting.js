@@ -26,7 +26,7 @@ class TickleRepoIntrospectHarvesting extends React.Component {
     };
 
     availableRows() {
-        let availableHeight = Math.round((window.innerHeight - Constants.VIEW_HEIGHT_OFFSET) / Constants.VIEW_LINE_HEIGHT);
+        let availableHeight = Math.round((window.innerHeight - Constants.HARVEST_HEIGHT_OFFSET) / Constants.HARVEST_LINE_HEIGHT);
         return availableHeight < 3 ? 3 : availableHeight;
     }
 
@@ -53,14 +53,14 @@ class TickleRepoIntrospectHarvesting extends React.Component {
                     </div>
                 </div>
                 <div className="flex-container">
-                    <textarea value=''
+                    <textarea value={this.props.recordsToHarvest.join("\n")}
                               readOnly={true}
                               style={{
                                   width: '100%',
                                   fontFamily: 'Courier New',
                                   fontSize: Constants.VIEW_FONT_SIZE + 'px',
                                   fontWeight: '500',
-                                  lineHeight: Constants.VIEW_LINE_HEIGHT + 'px',
+                                  lineHeight: Constants.HARVEST_LINE_HEIGHT + 'px',
                                   resize: 'none',
                                   backgroundColor: '#ffffff',
                                   color: this.props.textColor,
@@ -72,7 +72,8 @@ class TickleRepoIntrospectHarvesting extends React.Component {
                     />
                 </div>
                 <div style={{float: 'right'}}>
-                    <button>Start høstning</button>
+                    <button onClick={this.props.handleClearHarvestList}>Tøm listen</button>
+                    <button onClick={this.props.handleBeginHarvest}>Start høstning</button>
                 </div>
             </div>
         );

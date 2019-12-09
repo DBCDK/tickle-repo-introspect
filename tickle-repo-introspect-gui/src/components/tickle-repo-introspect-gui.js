@@ -30,7 +30,9 @@ class TickleRepoIntrospectGUI extends React.Component {
             showBlanks: false,
             recordIdWidth: 0,
             dataSetsForLocalId: [],
-            inputMode: Constants.INPUT_MODE.LOCALID_WITH_LOOKUP
+            inputMode: Constants.INPUT_MODE.LOCALID_WITH_LOOKUP,
+
+            recordsToHarvest: []
         };
 
         this.getInstance = this.getInstance.bind(this);
@@ -46,6 +48,10 @@ class TickleRepoIntrospectGUI extends React.Component {
         this.handleShowBlanksChecked = this.handleShowBlanksChecked.bind(this);
         this.handleResetLinkClicked = this.handleResetLinkClicked.bind(this);
         this.handleDatasetSelected = this.handleDatasetSelected.bind(this);
+
+        this.handleAddToHarvest = this.handleAddToHarvest.bind(this);
+        this.handleClearHarvestList = this.handleClearHarvestList.bind(this);
+        this.handleBeginHarvest = this.handleBeginHarvest.bind(this);
 
         this.handleEscapeKeyPress = this.handleEscapeKeyPress.bind(this);
         this.handleLocalIdKeyPress = this.handleLocalIdKeyPress.bind(this);
@@ -80,6 +86,17 @@ class TickleRepoIntrospectGUI extends React.Component {
         if(event.keyCode === 13) {
             this.setState({dataSetsForLocalId: []});
         }
+    }
+
+    handleClearHarvestList(event) {
+        this.setState({recordsToHarvest: []})
+        console.log("CLEAR");
+    }
+
+    handleBeginHarvest(event) {
+        // Todo: Start a harvets THEN clear the list
+        this.setState({recordsToHarvest: []})
+        console.log("BEGIN");
     }
 
     setInitialTab(tab) {
@@ -253,6 +270,15 @@ class TickleRepoIntrospectGUI extends React.Component {
             dataSet: name,
             dataSetsForLocalId: []
         })
+    }
+
+    handleAddToHarvest(event) {
+        if( this.state.recordsToHarvest.includes(event.target.value)) {
+            return;
+        }
+        let records = this.state.recordsToHarvest;
+        records.push(event.target.value);
+        this.setState({recordsToHarvest: records});
     }
 
     reset() {
@@ -450,10 +476,14 @@ class TickleRepoIntrospectGUI extends React.Component {
                                                 showBlanks={this.state.showBlanks}
                                                 handleShowBlanksChecked={this.handleShowBlanksChecked}
                                                 isLineFormatSupported={this.state.isLineFormatSupported}
-                                                isXmlFormatSupported={this.state.isXmlFormatSupported}/>
+                                                isXmlFormatSupported={this.state.isXmlFormatSupported}
+                                                recordsToHarvest={this.state.recordsToHarvest}
+                                                handleAddToHarvest={this.handleAddToHarvest}/>
                         </Tab>
                         <Tab eventKey={'harvest'} title="Høstning" style={{margin: '10px'}}>
-                            <TickleRepoIntrospectHarvesting/>
+                            <TickleRepoIntrospectHarvesting recordsToHarvest={this.state.recordsToHarvest}
+                                                            handleClearHarvestList={this.handleClearHarvestList}
+                                                            handleBeginHarvest={this.handleBeginHarvest}/>
                         </Tab>
                     </Tabs>
                 </div>

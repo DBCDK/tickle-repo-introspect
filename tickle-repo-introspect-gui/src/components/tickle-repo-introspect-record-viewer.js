@@ -4,7 +4,7 @@
  */
 
 import React from "react";
-import RawrepoIntrospectRecordFormatSelector from './tickle-repo-introspect-record-format-selector';
+import TickleRepoIntrospectRecordFormatSelector from './tickle-repo-introspect-record-format-selector';
 import { dateFormatter } from './tickle-repo-introspect-date-formatter'
 import * as Constants from './tickle-repo-introspect-constants';
 
@@ -63,7 +63,7 @@ class TickleRepoIntrospectRecordViewer extends React.Component {
                 <div style={{width: '100%', overflow: 'hidden'}}>
                     <div className='form-group' style={{height: '28px'}}>
                         <div style={{float: 'left'}}>
-                            <RawrepoIntrospectRecordFormatSelector
+                            <TickleRepoIntrospectRecordFormatSelector
                                 id='record-format-selector'
                                 format={this.props.format}
                                 record={this.props.record}

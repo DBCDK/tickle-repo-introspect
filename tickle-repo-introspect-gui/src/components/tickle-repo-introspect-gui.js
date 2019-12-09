@@ -8,6 +8,7 @@ import {Tab, Tabs} from "react-bootstrap";
 import DataSetSummaryList from "./tickle-repo-introspect-dataset-summary-list";
 import TickleRepoIntrospectRecordViewer from "./tickle-repo-introspect-record-viewer";
 import TickleRepoIntrospectRecordIdInput from "./tickle-repo-introspect-recordid-input";
+import TickleRepoIntrospectHarvesting from "./tickle-repo-introspect-harvesting";
 import queryString from 'query-string'
 import * as Constants from './tickle-repo-introspect-constants';
 const request = require('superagent');
@@ -106,7 +107,7 @@ class TickleRepoIntrospectGUI extends React.Component {
         // Check for initial values from the querystring
         const queryParams = queryString.parse(location.search);
         let recordId = queryParams["recordId"] !== undefined ? queryParams["recordId"] : this.state.recordId;
-        if( queryParams['tab'] === undefined || !["overblik", "visning"].includes(queryParams['tab']) ) {
+        if( queryParams['tab'] === undefined || !["overblik", "visning", 'harvest'].includes(queryParams['tab']) ) {
             this.redirectToUrlWithParams('overblik', recordId);
         } else {
             this.setInitialTab(queryParams["tab"], recordId);
@@ -450,6 +451,9 @@ class TickleRepoIntrospectGUI extends React.Component {
                                                 handleShowBlanksChecked={this.handleShowBlanksChecked}
                                                 isLineFormatSupported={this.state.isLineFormatSupported}
                                                 isXmlFormatSupported={this.state.isXmlFormatSupported}/>
+                        </Tab>
+                        <Tab eventKey={'harvest'} title="Høstning" style={{margin: '10px'}}>
+                            <TickleRepoIntrospectHarvesting/>
                         </Tab>
                     </Tabs>
                 </div>

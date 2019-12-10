@@ -51,49 +51,18 @@ class TickleRepoIntrospectGUI extends React.Component {
         this.handleTabSelect = this.handleTabSelect.bind(this);
         this.handleDataSetChange = this.handleDataSetChange.bind(this);
         this.handleLocalIdChange = this.handleLocalIdChange.bind(this);
-        this.handleChangeFormat = this.handleChangeFormat.bind(this);
         this.handleShowBlanksChecked = this.handleShowBlanksChecked.bind(this);
         this.handleResetLinkClicked = this.handleResetLinkClicked.bind(this);
         this.handleDatasetSelected = this.handleDatasetSelected.bind(this);
-
-        this.handleAddToHarvest = this.handleAddToHarvest.bind(this);
-
         this.handleEscapeKeyPress = this.handleEscapeKeyPress.bind(this);
         this.handleLocalIdKeyPress = this.handleLocalIdKeyPress.bind(this);
+
+        this.handleChangeFormat = this.handleChangeFormat.bind(this);
+        this.handleAddToHarvest = this.handleAddToHarvest.bind(this);
 
         this.localIdRef = React.createRef();
         this.harvesterRef = React.createRef();
     }
-
-    handleEscapeKeyPress(event){
-        if(event.keyCode === 27) {
-            this.reset();
-        }
-    }
-
-    handleLocalIdKeyPress(event){
-
-        // Arrow up-down: Select a dataset when  multiple sets are available
-        if(event.keyCode === 38 || event.keyCode === 40) { // up-down
-            if( this.state.dataSetsForLocalId.length > 0 ) {
-                let curr = this.state.dataSetsForLocalId.indexOf(this.state.dataSet);
-                if( event.keyCode === 38 && curr > 0 ) {
-                    this.setState({dataSet: this.state.dataSetsForLocalId[curr - 1]});
-                    this.setNewRecordId(this.state.dataSet + ':' + this.state.localId);
-                }
-                if( event.keyCode === 40 && curr < this.state.dataSetsForLocalId.length - 1 ) {
-                    this.setState({dataSet: this.state.dataSetsForLocalId[curr + 1]});
-                    this.setNewRecordId(this.state.dataSet + ':' + this.state.localId);
-                }
-            }
-        }
-
-        // enter: Close select div for multiple datasets
-        if(event.keyCode === 13) {
-            this.setState({dataSetsForLocalId: []});
-        }
-    }
-
 
     setInitialTab(tab) {
         this.setState({view: tab});
@@ -160,6 +129,35 @@ class TickleRepoIntrospectGUI extends React.Component {
             window.history.replaceState('', document.title, params);
         } else {
             location.search = params;
+        }
+    }
+
+    handleEscapeKeyPress(event){
+        if(event.keyCode === 27) {
+            this.reset();
+        }
+    }
+
+    handleLocalIdKeyPress(event){
+
+        // Arrow up-down: Select a dataset when  multiple sets are available
+        if(event.keyCode === 38 || event.keyCode === 40) { // up-down
+            if( this.state.dataSetsForLocalId.length > 0 ) {
+                let curr = this.state.dataSetsForLocalId.indexOf(this.state.dataSet);
+                if( event.keyCode === 38 && curr > 0 ) {
+                    this.setState({dataSet: this.state.dataSetsForLocalId[curr - 1]});
+                    this.setNewRecordId(this.state.dataSet + ':' + this.state.localId);
+                }
+                if( event.keyCode === 40 && curr < this.state.dataSetsForLocalId.length - 1 ) {
+                    this.setState({dataSet: this.state.dataSetsForLocalId[curr + 1]});
+                    this.setNewRecordId(this.state.dataSet + ':' + this.state.localId);
+                }
+            }
+        }
+
+        // enter: Close select div for multiple datasets
+        if(event.keyCode === 13) {
+            this.setState({dataSetsForLocalId: []});
         }
     }
 

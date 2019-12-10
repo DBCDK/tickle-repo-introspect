@@ -5,7 +5,7 @@
 
 import React from "react";
 
-export const HARVEST_HEIGHT_OFFSET = 300;
+export const HARVEST_HEIGHT_OFFSET = 320;
 export const HARVEST_LINE_HEIGHT = 22;
 export const VIEW_HEIGHT_OFFSET = 280;
 export const VIEW_LINE_HEIGHT = 22;

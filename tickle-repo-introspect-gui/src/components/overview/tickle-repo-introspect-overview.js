@@ -5,9 +5,9 @@
 
 import React from "react";
 import {BootstrapTable, TableHeaderColumn} from "react-bootstrap-table";
-import { dateFormatter } from './tickle-repo-introspect-date-formatter'
+import { dateFormatter } from '../tickle-repo-introspect-date-formatter'
 
-class DataSetSummaryList extends React.Component {
+class TickleRepoIntrospectOverview extends React.Component {
 
     constructor(props) {
         super(props);
@@ -50,4 +50,4 @@ class DataSetSummaryList extends React.Component {
 
 }
 
-export default DataSetSummaryList;
+export default TickleRepoIntrospectOverview;

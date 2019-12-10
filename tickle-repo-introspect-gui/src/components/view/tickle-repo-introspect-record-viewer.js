@@ -5,8 +5,8 @@
 
 import React from "react";
 import TickleRepoIntrospectRecordFormatSelector from './tickle-repo-introspect-record-format-selector';
-import { dateFormatter } from './tickle-repo-introspect-date-formatter'
-import * as Constants from './tickle-repo-introspect-constants';
+import { dateFormatter } from '../tickle-repo-introspect-date-formatter'
+import * as Constants from '../tickle-repo-introspect-constants';
 
 class TickleRepoIntrospectRecordViewer extends React.Component {
 

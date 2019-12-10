@@ -6,10 +6,10 @@
 import React from "react";
 import {Tab, Tabs} from "react-bootstrap";
 
-import DataSetSummaryList from "./tickle-repo-introspect-dataset-summary-list";
-import TickleRepoIntrospectRecordViewer from "./tickle-repo-introspect-record-viewer";
+import TickleRepoIntrospectOverview from "./overview/tickle-repo-introspect-overview";
+import TickleRepoIntrospectRecordViewer from "./view/tickle-repo-introspect-record-viewer";
 import TickleRepoIntrospectRecordIdInput from "./tickle-repo-introspect-recordid-input";
-import TickleRepoIntrospectHarvesting from "./tickle-repo-introspect-harvesting";
+import TickleRepoIntrospectHarvesting from "./harvest/tickle-repo-introspect-harvesting";
 import * as Constants from './tickle-repo-introspect-constants';
 
 import queryString from 'query-string'
@@ -489,7 +489,7 @@ class TickleRepoIntrospectGUI extends React.Component {
                           animation={false}
                           id="tabs">
                         <Tab eventKey={'overblik'} title="Overblik" style={{margin: '10px'}}>
-                            <DataSetSummaryList datasets={this.state.datasets}/>
+                            <TickleRepoIntrospectOverview datasets={this.state.datasets}/>
                         </Tab>
                         <Tab eventKey={'visning'} title="Visning" style={{margin: '10px'}}>
                             <TickleRepoIntrospectRecordViewer record={this.state.record}

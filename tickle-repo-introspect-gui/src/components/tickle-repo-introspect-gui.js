@@ -5,12 +5,15 @@
 
 import React from "react";
 import {Tab, Tabs} from "react-bootstrap";
+
 import DataSetSummaryList from "./tickle-repo-introspect-dataset-summary-list";
 import TickleRepoIntrospectRecordViewer from "./tickle-repo-introspect-record-viewer";
 import TickleRepoIntrospectRecordIdInput from "./tickle-repo-introspect-recordid-input";
 import TickleRepoIntrospectHarvesting from "./tickle-repo-introspect-harvesting";
-import queryString from 'query-string'
 import * as Constants from './tickle-repo-introspect-constants';
+
+import queryString from 'query-string'
+
 const request = require('superagent');
 
 class TickleRepoIntrospectGUI extends React.Component {
@@ -41,6 +44,9 @@ class TickleRepoIntrospectGUI extends React.Component {
         this.setNewRecordId = this.setNewRecordId.bind(this);
         this.getRecordFromRecordId = this.getRecordFromRecordId.bind(this);
 
+        this.clearHarvestList = this.clearHarvestList.bind(this);
+        this.harvestRecords = this.harvestRecords.bind(this);
+
         this.handleTabSelect = this.handleTabSelect.bind(this);
         this.handleDataSetChange = this.handleDataSetChange.bind(this);
         this.handleLocalIdChange = this.handleLocalIdChange.bind(this);
@@ -50,13 +56,12 @@ class TickleRepoIntrospectGUI extends React.Component {
         this.handleDatasetSelected = this.handleDatasetSelected.bind(this);
 
         this.handleAddToHarvest = this.handleAddToHarvest.bind(this);
-        this.handleClearHarvestList = this.handleClearHarvestList.bind(this);
-        this.handleBeginHarvest = this.handleBeginHarvest.bind(this);
 
         this.handleEscapeKeyPress = this.handleEscapeKeyPress.bind(this);
         this.handleLocalIdKeyPress = this.handleLocalIdKeyPress.bind(this);
 
         this.localIdRef = React.createRef();
+        this.harvesterRef = React.createRef();
     }
 
     handleEscapeKeyPress(event){
@@ -88,16 +93,6 @@ class TickleRepoIntrospectGUI extends React.Component {
         }
     }
 
-    handleClearHarvestList(event) {
-        this.setState({recordsToHarvest: []})
-        console.log("CLEAR");
-    }
-
-    handleBeginHarvest(event) {
-        // Todo: Start a harvets THEN clear the list
-        this.setState({recordsToHarvest: []})
-        console.log("BEGIN");
-    }
 
     setInitialTab(tab) {
         this.setState({view: tab});
@@ -116,9 +111,17 @@ class TickleRepoIntrospectGUI extends React.Component {
         if (this.state.instance === '') {
             this.getInstance();
         }
+
+        // Fetch a list of defined datasets (sources)
         if (this.state.datasets === undefined) {
             // List can be empty, hence no default 'datasets' in state
             this.getDatasets();
+        }
+
+        // Fetch a list of defined tickle-harvester
+        if (this.state.harvesters === undefined) {
+            // List can be empty, hence no default 'harvesters' in state
+            this.getHarvesters();
         }
 
         // Check for initial values from the querystring
@@ -437,15 +440,37 @@ class TickleRepoIntrospectGUI extends React.Component {
         }
     }
 
+    getHarvesters() {
+        // Todo: fetch list from Dataio via the api
+        let harvesters = [];
+        harvesters.push('Harvester name 1');
+        harvesters.push('Harvester name 2');
+        this.setState({harvesters: harvesters});
+    }
+
     getBaseUrl() {
         let parts = window.location.toString().split("?");
         return parts.length > 0 ? parts[0] : window.location;
     }
 
+    harvestRecords() {
+        let harvester = this.state.harvesters[this.harvesterRef.current.selectedIndex];
+
+        // Todo: Start a harvest
+        console.log("Todo: harvest records with harvester '" + harvester + "'");
+
+        // Clear the list
+        this.setState({recordsToHarvest: []})
+    }
+
+    clearHarvestList() {
+        this.setState({recordsToHarvest: []})
+    }
+
     render() {
         return (
             <div style={{width: '100%', overflow: 'hidden'}}>
-                <h2><a href={this.getBaseUrl()} onClick={this.handleResetLinkClicked}>Tickle Repo</a> <b>{this.state.instance}</b> - {this.state.datasets == undefined ? 0 : this.state.datasets.length} kilder</h2>
+                <h2><a href={this.getBaseUrl()} onClick={this.handleResetLinkClicked}>Tickle Repo</a> <b>{this.state.instance}</b> - {this.state.datasets === undefined ? 0 : this.state.datasets.length} kilder</h2>
                 <div style={{marginBottom: '60px'}}>
                     <TickleRepoIntrospectRecordIdInput dataSet={this.state.dataSet}
                                                        dataSetsForLocalId={this.state.dataSetsForLocalId}
@@ -482,8 +507,10 @@ class TickleRepoIntrospectGUI extends React.Component {
                         </Tab>
                         <Tab eventKey={'harvest'} title="Høstning" style={{margin: '10px'}}>
                             <TickleRepoIntrospectHarvesting recordsToHarvest={this.state.recordsToHarvest}
-                                                            handleClearHarvestList={this.handleClearHarvestList}
-                                                            handleBeginHarvest={this.handleBeginHarvest}/>
+                                                            harvestRecords={this.harvestRecords}
+                                                            clearHarvestList={this.clearHarvestList}
+                                                            harvesters={this.state.harvesters}
+                                                            harvesterRef={this.harvesterRef}/>
                         </Tab>
                     </Tabs>
                 </div>

@@ -4,6 +4,7 @@
  */
 
 import React from "react";
+import {Button, Modal} from "react-bootstrap";
 import * as Constants from './tickle-repo-introspect-constants';
 import TickleRepoIntrospectDataioHarvesterSelector from "./tickle-repo-introspect-dataio-harvester-selector";
 
@@ -17,11 +18,17 @@ class TickleRepoIntrospectHarvesting extends React.Component {
         };
 
         this.updateDimensions = this.updateDimensions.bind(this);
+
+        this.handleClearHarvestList = this.handleClearHarvestList.bind(this);
+        this.handleRejectClearHarvestList = this.handleRejectClearHarvestList.bind(this);
+        this.handleConfirmClearHarvestList = this.handleConfirmClearHarvestList.bind(this);
+        this.handleBeginHarvest = this.handleBeginHarvest.bind(this);
     }
 
     updateDimensions() {
         this.setState({
-            textareaCols: this.availableRows()
+            textareaCols: this.availableRows(),
+            showConfirm: false
         });
     };
 
@@ -42,13 +49,31 @@ class TickleRepoIntrospectHarvesting extends React.Component {
         window.removeEventListener("resize", this.updateDimensions);
     }
 
+    handleClearHarvestList(event) {
+        this.setState({showConfirm: true});
+    }
+
+    handleRejectClearHarvestList() {
+        this.setState({showConfirm: false})
+    }
+
+    handleConfirmClearHarvestList() {
+        this.setState({showConfirm: false})
+        this.props.clearHarvestList();
+    }
+
+    handleBeginHarvest(event) {
+        this.props.harvestRecords();
+    }
+
     render() {
         return (
             <div>
                 <div style={{width: '100%', overflow: 'hidden'}}>
                     <div className='form-group' style={{height: '28px'}}>
                         <div style={{float: 'left'}}>
-                            <TickleRepoIntrospectDataioHarvesterSelector/>
+                            <TickleRepoIntrospectDataioHarvesterSelector harvesters={this.props.harvesters}
+                                                                         harvesterRef={this.props.harvesterRef}/>
                         </div>
                     </div>
                 </div>
@@ -72,9 +97,30 @@ class TickleRepoIntrospectHarvesting extends React.Component {
                     />
                 </div>
                 <div style={{float: 'right'}}>
-                    <button onClick={this.props.handleClearHarvestList}>Tøm listen</button>
-                    <button onClick={this.props.handleBeginHarvest}>Start høstning</button>
+                    <Button onClick={this.handleClearHarvestList}
+                            disabled={this.props.recordsToHarvest.length == 0}>
+                        Tøm listen
+                    </Button>
+                    <Button onClick={this.handleBeginHarvest}
+                            disabled={this.props.recordsToHarvest.length == 0}
+                            bsStyle="primary">
+                        Start høstning
+                    </Button>
                 </div>
+                <Modal show={this.state.showConfirm} onHide={this.handleRejectClearHarvestList} animation={false}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Tøm listen</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>Er du sikker på at du vil slette alle record id'er i listen?</Modal.Body>
+                    <Modal.Footer>
+                        <Button bsStyle="primary" onClick={this.handleRejectClearHarvestList}>
+                            Afbryd
+                        </Button>
+                        <Button bsStyle="secondary" onClick={this.handleConfirmClearHarvestList}>
+                            Fortsæt
+                        </Button>
+                    </Modal.Footer>
+                </Modal>
             </div>
         );
     }

@@ -4,26 +4,26 @@
  */
 
 import React from "react";
-import {Button, ButtonGroup, ToggleButtonGroup, ToggleButton} from "react-bootstrap";
+import {FormGroup, FormControl} from "react-bootstrap";
 
 class TickleRepoIntrospectDataioHarvesterSelector extends React.Component {
 
     constructor(props) {
         super(props);
-
-        this.recordIdRef = React.createRef();
     }
 
     render() {
-        const format = this.props.format;
 
         return (
             <div>
-                <select>
-                    <option value={'abc'}>ABC</option>
-                    <option value={'def'}>DEF</option>
-                </select>
-
+                <FormGroup controlId="formControlsSelect">
+                    <FormControl componentClass="select"
+                                 placeholder="select"
+                                 inputRef={this.props.harvesterRef}>
+                        {(this.props.harvesters !== undefined ? this.props.harvesters : []).map((name, index) =>
+                        <option key={index} value={index}>{name}</option>)}
+                    </FormControl>
+                </FormGroup>
             </div>
         )
     }

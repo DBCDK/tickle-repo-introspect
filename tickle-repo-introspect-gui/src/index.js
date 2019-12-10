@@ -5,9 +5,10 @@
 
 const React = require("react");
 const ReactDOM = require("react-dom");
+
 import TickleRepoIntrospectGUI from './components/tickle-repo-introspect-gui';
 
 ReactDOM.render(
-<TickleRepoIntrospectGUI/>,
+    <TickleRepoIntrospectGUI/>,
     document.getElementById('root')
 );

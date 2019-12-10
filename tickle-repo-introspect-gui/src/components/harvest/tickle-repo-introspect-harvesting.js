@@ -70,14 +70,6 @@ class TickleRepoIntrospectHarvesting extends React.Component {
     render() {
         return (
             <div>
-                <div style={{width: '100%', overflow: 'hidden'}}>
-                    <div className='form-group' style={{height: '28px'}}>
-                        <div style={{float: 'left'}}>
-                            <TickleRepoIntrospectDataioHarvesterSelector harvesters={this.props.harvesters}
-                                                                         harvesterRef={this.props.harvesterRef}/>
-                        </div>
-                    </div>
-                </div>
                 <div className="flex-container">
                     <textarea value={this.props.recordsToHarvest.join("\n")}
                               readOnly={true}
@@ -97,16 +89,24 @@ class TickleRepoIntrospectHarvesting extends React.Component {
                               rows={this.state.textareaCols}
                     />
                 </div>
-                <div style={{float: 'right'}}>
-                    <Button onClick={this.handleClearHarvestList}
-                            disabled={this.props.recordsToHarvest.length == 0}>
-                        Tøm listen
-                    </Button>
-                    <Button onClick={this.handleBeginHarvest}
-                            disabled={this.props.recordsToHarvest.length == 0}
-                            bsStyle="primary">
-                        Start høstning
-                    </Button>
+                <div style={{width: '100%', overflow: 'hidden', marginTop: '4px'}}>
+                    <div className='form-group' style={{height: '28px'}}>
+                        <Button onClick={this.handleClearHarvestList}
+                                disabled={this.props.recordsToHarvest.length == 0}
+                                style={{float: 'right'}}>
+                            Tøm listen
+                        </Button>
+                        <Button onClick={this.handleBeginHarvest}
+                                disabled={this.props.recordsToHarvest.length == 0}
+                                style={{marginLeft: '4px', marginRight: '20px', float: 'right'}}
+                                bsStyle="primary">
+                            Start høstning
+                        </Button>
+                        <div style={{float: 'right'}}>
+                            <TickleRepoIntrospectDataioHarvesterSelector harvesters={this.props.harvesters}
+                                                                         harvesterRef={this.props.harvesterRef}/>
+                        </div>
+                    </div>
                 </div>
                 <Modal show={this.state.showConfirm} onHide={this.handleRejectClearHarvestList} animation={false}>
                     <Modal.Header closeButton>

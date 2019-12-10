@@ -24,14 +24,15 @@ class TickleRepoIntrospectGUI extends React.Component {
         this.state = {
             view: 'overblik',
             instance: '',
+
             record: null,
             recordLoaded: false,
+
             dataSet: '',
             localId: '',
             recordId: '',
             format: '',
             showBlanks: false,
-            recordIdWidth: 0,
             dataSetsForLocalId: [],
             inputMode: Constants.INPUT_MODE.LOCALID_WITH_LOOKUP,
 
@@ -286,13 +287,13 @@ class TickleRepoIntrospectGUI extends React.Component {
 
     reset() {
         this.setState({
+            record: null,
+            recordLoaded: false,
+
             localId: '',
             dataSet: '',
             recordId: '',
-            recordIdWidth: 0,
-            record: null,
             format: '',
-            recordLoaded: false,
             inputMode: Constants.INPUT_MODE.LOCALID_WITH_LOOKUP,
             dataSetsForLocalId: []
         });

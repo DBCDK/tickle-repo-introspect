@@ -5,6 +5,7 @@
 
 import React from "react";
 import {BootstrapTable, TableHeaderColumn} from "react-bootstrap-table";
+
 import { dateFormatter } from '../tickle-repo-introspect-date-formatter'
 
 class TickleRepoIntrospectOverview extends React.Component {

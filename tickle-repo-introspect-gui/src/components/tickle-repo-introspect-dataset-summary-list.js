@@ -11,8 +11,6 @@ class DataSetSummaryList extends React.Component {
 
     constructor(props) {
         super(props);
-
-        //this.dateFormatter = this.dateFormatter.bind(this);
     }
 
     render() {

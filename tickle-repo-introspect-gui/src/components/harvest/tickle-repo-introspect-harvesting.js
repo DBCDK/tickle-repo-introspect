@@ -70,22 +70,10 @@ class TickleRepoIntrospectHarvesting extends React.Component {
     render() {
         return (
             <div>
-                <div className="flex-container">
+                <div>
                     <textarea value={this.props.recordsToHarvest.join("\n")}
+                              class='record-harvesting'
                               readOnly={true}
-                              style={{
-                                  width: '100%',
-                                  fontFamily: 'Courier New',
-                                  fontSize: Constants.VIEW_FONT_SIZE + 'px',
-                                  fontWeight: '500',
-                                  lineHeight: Constants.HARVEST_LINE_HEIGHT + 'px',
-                                  resize: 'none',
-                                  backgroundColor: '#ffffff',
-                                  color: this.props.textColor,
-                                  border: 'solid 1px #aaaaaa',
-                                  whiteSpace: 'pre',
-                                  letterSpacing: '0px'
-                              }}
                               rows={this.state.textareaCols}
                     />
                 </div>

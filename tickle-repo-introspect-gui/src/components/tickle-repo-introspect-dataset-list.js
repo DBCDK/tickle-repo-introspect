@@ -14,34 +14,18 @@ class TickleRepoIntrospectDataSetList extends React.Component {
 
     render() {
         return (
-            <div style={{
-                     border: 'solid 2px #bbbbbb',
-                     borderRadius: '3px',
+            <div class='dataset-list'
+                 style={{
                      width: this.props.getWidthOfDataSetField(),
-                     position: 'fixed',
-                     top: '62px',
-                     left: '5px',
                      visibility: this.props.dataSetsForLocalId.length > 0 ? 'visible' : 'hidden',
-                     display:'block',
-                     zIndex:'2',
-                     paddingLeft: '3px',
-                     paddingTop: '5px',
-                     backgroundColor: 'rgba(255, 255, 255, 1)'
                  }}>
                  {
                      this.props.dataSetsForLocalId.map((name, index) =>
                      <div key={index}>
-                        <a style={{
-                               marginRight: '10px',
-                               marginLeft: '5px',
-                               fontWeight: this.props.dataSet == name ? 'bold' : 'normal',
-                               cursor: 'pointer',
-                               fontFamily: 'Courier New',
-                               fontSize: Constants.FONT_SIZE + 'px',
-                               color: '#333333'
-                           }}
+                        <a style={{fontWeight: this.props.dataSet == name ? 'bold' : 'normal'}}
                            onClick={() => { this.handleDatasetSelected(name)}}
-                           key={index}>{name}</a>
+                           key={index}
+                           class={'dataset-list'}>{name}</a>
                      </div>)}
             </div>
         )

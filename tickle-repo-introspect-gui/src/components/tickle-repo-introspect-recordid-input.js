@@ -47,25 +47,18 @@ class TickleRepoIntrospectRecordIdInput extends React.Component {
             <div>
             <label className={'recordId-label'}
                    style={{marginLeft: '5px', marginRight: '20px', float: 'left'}}>
-                <input type="text"
+                <input type='text'
+                       class='recordid-input'
                        value={this.props.dataSet}
                        onChange={this.props.handleDataSetChange}
-                       style={{
-                           width: this.getWidthOfDataSetField(),
-                           fontFamily: 'Courier New',
-                           fontSize: Constants.FONT_SIZE + 'px',
-                           color: this.getLocalIdColor()
-                       }}
+                       style={{width: this.getWidthOfDataSetField(), color: this.getLocalIdColor()}}
                        placeholder={'data sæt'}/>
                 &nbsp;:&nbsp;
-                <input type="text"
+                <input type='text'
+                       class='recordid-input'
                        value={this.props.localId}
                        onChange={this.props.handleLocalIdChange}
-                       style={{
-                           width: this.getWidthOfLocalidField(),
-                           fontFamily: 'Courier New',
-                           fontSize: Constants.FONT_SIZE + 'px'
-                       }}
+                       style={{width: this.getWidthOfLocalidField()}}
                        autoFocus
                        ref={this.props.localIdRef}
                        placeholder={'lokal id'}

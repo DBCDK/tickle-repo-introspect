@@ -5,6 +5,7 @@
 
 import React from "react";
 import {Tab, Tabs} from "react-bootstrap";
+import queryString from 'query-string'
 
 import TickleRepoIntrospectOverview from "./overview/tickle-repo-introspect-overview";
 import TickleRepoIntrospectRecordViewer from "./view/tickle-repo-introspect-record-viewer";
@@ -12,7 +13,7 @@ import TickleRepoIntrospectRecordIdInput from "./tickle-repo-introspect-recordid
 import TickleRepoIntrospectHarvesting from "./harvest/tickle-repo-introspect-harvesting";
 import * as Constants from './tickle-repo-introspect-constants';
 
-import queryString from 'query-string'
+import './tickle-repo-introspect.css';
 
 const request = require('superagent');
 
@@ -496,7 +497,6 @@ class TickleRepoIntrospectGUI extends React.Component {
                                                 recordLoaded={this.state.recordLoaded}
                                                 format={this.state.format}
                                                 handleChangeFormat={this.handleChangeFormat}
-                                                textColor='#000000'
                                                 showBlanks={this.state.showBlanks}
                                                 handleShowBlanksChecked={this.handleShowBlanksChecked}
                                                 isLineFormatSupported={this.state.isLineFormatSupported}

@@ -5,13 +5,7 @@
 
 package dk.dbc.ticklerepo;
 
-import dk.dbc.ticklerepo.dto.DTOTransformer;
-import dk.dbc.ticklerepo.dto.DataSet;
-import dk.dbc.ticklerepo.dto.DataSetListDTO;
-import dk.dbc.ticklerepo.dto.DataSetSummary;
-import dk.dbc.ticklerepo.dto.DataSetSummaryListDTO;
-import dk.dbc.ticklerepo.dto.Record;
-import dk.dbc.ticklerepo.dto.RecordDTO;
+import dk.dbc.ticklerepo.dto.*;
 import dk.dbc.util.StopwatchInterceptor;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.slf4j.Logger;
@@ -29,6 +23,8 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -123,4 +119,19 @@ public class TickleRepoIntrospectService {
         return Response.ok(result, MediaType.APPLICATION_JSON).build();
     }
 
+    @GET
+    @Produces({MediaType.TEXT_PLAIN})
+    @Path("harvesters")
+    public Response getHarvesters() {
+
+        // Todo: Fetch a list of harvester config's from Dataio, final type is _not_ a simpel string
+        final List<String> harvesters = new ArrayList<String>();
+        harvesters.add("Dataio Harvester A");
+        harvesters.add("Dataio Harvester B");
+
+        final HarvesterListDTO result = new HarvesterListDTO();
+        result.setHarvesters(DTOTransformer.harvesterListToDTO(harvesters));
+
+        return Response.ok(result, MediaType.APPLICATION_JSON).build();
+    }
 }

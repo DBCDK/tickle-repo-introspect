@@ -79,6 +79,26 @@ public class DTOTransformer {
         return dto;
     }
 
+    public static List<HarvesterDTO> harvesterListToDTO(List<String> harvesterList) {
+        final List<HarvesterDTO> dtos = new ArrayList<>();
+
+        for (String harvester : harvesterList) {
+            dtos.add(harvesterToDTO(harvester));
+        }
+
+        return dtos;
+    }
+
+    // Todo: Take harvester config as input, not a simple string
+    public static HarvesterDTO harvesterToDTO(String harvester) {
+        final HarvesterDTO dto = new HarvesterDTO();
+
+        // Todo: Final type will be a harvesterconfig, not a simpel string
+        dto.setName(harvester);
+
+        return dto;
+    }
+
     private static String recordDataToLine(byte[] content) {
         try {
             final MarcXchangeV1Reader reader = new MarcXchangeV1Reader(new ByteArrayInputStream(content), StandardCharsets.UTF_8);

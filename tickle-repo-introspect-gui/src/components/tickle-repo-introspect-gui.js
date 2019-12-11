@@ -441,11 +441,18 @@ class TickleRepoIntrospectGUI extends React.Component {
     }
 
     getHarvesters() {
-        // Todo: fetch list from Dataio via the api
-        let harvesters = [];
-        harvesters.push('Harvester name 1');
-        harvesters.push('Harvester name 2');
-        this.setState({harvesters: harvesters});
+        request
+            .get('/api/v1/harvesters')
+            .set('Accepts', 'application/json')
+            .then(res => {
+                const harvesters = res.body.harvesters;
+                this.setState({
+                    harvesters: harvesters
+                });
+            })
+            .catch(err => {
+                alert(err.message);
+            });
     }
 
     getBaseUrl() {

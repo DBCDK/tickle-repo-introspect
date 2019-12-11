@@ -10,6 +10,12 @@ class TickleRepoIntrospectDataioHarvesterSelector extends React.Component {
 
     constructor(props) {
         super(props);
+
+        this.handleOnChange = this.handleOnChange.bind(this);
+    }
+
+    handleOnChange(event) {
+        this.props.setSelectedHarvester(event.target.value);
     }
 
     render() {
@@ -19,7 +25,7 @@ class TickleRepoIntrospectDataioHarvesterSelector extends React.Component {
                 <FormGroup controlId="formControlsSelect">
                     <FormControl componentClass="select"
                                  placeholder="select"
-                                 inputRef={this.props.harvesterRef}>
+                                 onChange={this.handleOnChange}>
                         {(this.props.harvesters !== undefined ? this.props.harvesters : []).map((harvester, index) =>
                         <option key={index} value={index}>{harvester.name}</option>)} // Todo: harvester fields may change
                     </FormControl>

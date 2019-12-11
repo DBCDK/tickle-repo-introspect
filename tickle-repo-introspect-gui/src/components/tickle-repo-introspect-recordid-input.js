@@ -48,14 +48,14 @@ class TickleRepoIntrospectRecordIdInput extends React.Component {
             <label className={'recordId-label'}
                    style={{marginLeft: '5px', marginRight: '20px', float: 'left'}}>
                 <input type='text'
-                       class='recordid-input'
+                       className='recordid-input'
                        value={this.props.dataSet}
                        onChange={this.props.handleDataSetChange}
                        style={{width: this.getWidthOfDataSetField(), color: this.getLocalIdColor()}}
                        placeholder={'data sæt'}/>
                 &nbsp;:&nbsp;
                 <input type='text'
-                       class='recordid-input'
+                       className='recordid-input'
                        value={this.props.localId}
                        onChange={this.props.handleLocalIdChange}
                        style={{width: this.getWidthOfLocalidField()}}

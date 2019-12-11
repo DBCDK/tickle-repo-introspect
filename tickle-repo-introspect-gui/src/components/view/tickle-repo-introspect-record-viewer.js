@@ -14,17 +14,11 @@ class TickleRepoIntrospectRecordViewer extends React.Component {
     constructor(props) {
         super(props);
 
-        this.state = {
-            textareaCols: this.availableRows()
-        };
-
         this.updateDimensions = this.updateDimensions.bind(this);
     }
 
     updateDimensions() {
-        this.setState({
-            textareaCols: this.availableRows()
-        });
+        this.props.setTextareaCols(this.availableRows());
     };
 
     availableRows() {
@@ -96,9 +90,9 @@ class TickleRepoIntrospectRecordViewer extends React.Component {
                 <div>
                     <textarea value={ this.getRecordForSelectedFormat() }
                               readOnly={true}
-                              class='record-viewer'
+                              className='record-viewer'
                               style={{letterSpacing: this.props.showBlanks && this.props.format == 'LINE' ? '2px' : '0px'}}
-                              rows={this.state.textareaCols}
+                              rows={this.props.textareaCols}
                     />
                 </div>
             </div>

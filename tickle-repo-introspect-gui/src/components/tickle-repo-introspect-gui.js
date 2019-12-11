@@ -37,7 +37,12 @@ class TickleRepoIntrospectGUI extends React.Component {
             dataSetsForLocalId: [],
             inputMode: Constants.INPUT_MODE.LOCALID_WITH_LOOKUP,
 
-            recordsToHarvest: []
+            recordsToHarvest: [],
+            showDeleteHarvestRecordsConfirmModal: false,
+            selectedHarvester: -1,
+
+            harvestingTextareaCols: 10,
+            viewTextareaCols: 10
         };
 
         this.getInstance = this.getInstance.bind(this);
@@ -61,8 +66,30 @@ class TickleRepoIntrospectGUI extends React.Component {
         this.handleChangeFormat = this.handleChangeFormat.bind(this);
         this.handleAddToHarvest = this.handleAddToHarvest.bind(this);
 
+        this.setHarvestingTextareaCols = this.setHarvestingTextareaCols.bind(this);
+        this.setViewTextareaCols = this.setViewTextareaCols.bind(this);
+        this.setShowDeleteHarvestRecordsConfirmModal = this.setShowDeleteHarvestRecordsConfirmModal.bind(this);
+        this.setSelectedHarvester = this.setSelectedHarvester.bind(this);
+
         this.localIdRef = React.createRef();
-        this.harvesterRef = React.createRef();
+    }
+
+    setHarvestingTextareaCols(cols) {
+        console.log("harvesting " + cols);
+        this.setState({harvestingTextareaCols: cols});
+    }
+
+    setViewTextareaCols(cols) {
+        console.log("view " + cols);
+        this.setState({viewTextareaCols: cols});
+    }
+
+    setSelectedHarvester(index) {
+        this.setState({selectedHarvester: index});
+    }
+
+    setShowDeleteHarvestRecordsConfirmModal(show) {
+        this.setState({showDeleteHarvestRecordsConfirmModal: show});
     }
 
     setInitialTab(tab) {
@@ -461,10 +488,15 @@ class TickleRepoIntrospectGUI extends React.Component {
     }
 
     harvestRecords() {
-        let harvester = this.state.harvesters[this.harvesterRef.current.selectedIndex];
+        console.log("harvest " + this.state.selectedHarvester);
+        if( this.state.selectedHarvester == -1 ) {
+            return;
+        }
+
+        let harvester = this.state.harvesters[this.state.selectedHarvester];
 
         // Todo: Start a harvest
-        console.log("Todo: harvest records with harvester '" + harvester + "'");
+        console.log("Todo: harvest records with harvester '" + harvester.name + "'");
 
         // Clear the list
         this.setState({recordsToHarvest: []})
@@ -509,14 +541,20 @@ class TickleRepoIntrospectGUI extends React.Component {
                                                 isLineFormatSupported={this.state.isLineFormatSupported}
                                                 isXmlFormatSupported={this.state.isXmlFormatSupported}
                                                 recordsToHarvest={this.state.recordsToHarvest}
-                                                handleAddToHarvest={this.handleAddToHarvest}/>
+                                                handleAddToHarvest={this.handleAddToHarvest}
+                                                textareaCols={this.state.viewTextareaCols}
+                                                setTextareaCols={this.setViewTextareaCols}/>
                         </Tab>
                         <Tab eventKey={'harvest'} title="Høstning" style={{margin: '10px'}}>
                             <TickleRepoIntrospectHarvesting recordsToHarvest={this.state.recordsToHarvest}
                                                             harvestRecords={this.harvestRecords}
                                                             clearHarvestList={this.clearHarvestList}
                                                             harvesters={this.state.harvesters}
-                                                            harvesterRef={this.harvesterRef}/>
+                                                            setSelectedHarvester={this.setSelectedHarvester}
+                                                            textareaCols={this.state.harvestingTextareaCols}
+                                                            setTextareaCols={this.setHarvestingTextareaCols}
+                                                            showDeleteHarvestRecordsConfirmModal={this.state.showDeleteHarvestRecordsConfirmModal}
+                                                            setShowDeleteHarvestRecordsConfirmModal={this.state.setShowDeleteHarvestRecordsConfirmModal}/>
                         </Tab>
                     </Tabs>
                 </div>

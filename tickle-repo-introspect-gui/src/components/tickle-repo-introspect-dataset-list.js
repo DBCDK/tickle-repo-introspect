@@ -14,7 +14,7 @@ class TickleRepoIntrospectDataSetList extends React.Component {
 
     render() {
         return (
-            <div class='dataset-list'
+            <div className='dataset-list'
                  style={{
                      width: this.props.getWidthOfDataSetField(),
                      visibility: this.props.dataSetsForLocalId.length > 0 ? 'visible' : 'hidden',
@@ -25,7 +25,7 @@ class TickleRepoIntrospectDataSetList extends React.Component {
                         <a style={{fontWeight: this.props.dataSet == name ? 'bold' : 'normal'}}
                            onClick={() => { this.handleDatasetSelected(name)}}
                            key={index}
-                           class={'dataset-list'}>{name}</a>
+                           className={'dataset-list'}>{name}</a>
                      </div>)}
             </div>
         )

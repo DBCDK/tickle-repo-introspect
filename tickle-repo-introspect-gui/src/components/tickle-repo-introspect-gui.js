@@ -75,12 +75,10 @@ class TickleRepoIntrospectGUI extends React.Component {
     }
 
     setHarvestingTextareaCols(cols) {
-        console.log("harvesting " + cols);
         this.setState({harvestingTextareaCols: cols});
     }
 
     setViewTextareaCols(cols) {
-        console.log("view " + cols);
         this.setState({viewTextareaCols: cols});
     }
 
@@ -488,7 +486,6 @@ class TickleRepoIntrospectGUI extends React.Component {
     }
 
     harvestRecords() {
-        console.log("harvest " + this.state.selectedHarvester);
         if( this.state.selectedHarvester == -1 ) {
             return;
         }

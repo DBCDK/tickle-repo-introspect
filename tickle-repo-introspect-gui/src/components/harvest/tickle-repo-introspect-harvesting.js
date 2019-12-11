@@ -71,6 +71,7 @@ class TickleRepoIntrospectHarvesting extends React.Component {
         return (
             <div>
                 <div>
+                    // Todo: textarea must handle direct input as well (and paste'd content)
                     <textarea value={this.props.recordsToHarvest.join("\n")}
                               class='record-harvesting'
                               readOnly={true}

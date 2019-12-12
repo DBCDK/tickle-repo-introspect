@@ -20,8 +20,12 @@ class TickleRepoIntrospectHarvesting extends React.Component {
         this.handleRejectClearHarvestList = this.handleRejectClearHarvestList.bind(this);
         this.handleConfirmClearHarvestList = this.handleConfirmClearHarvestList.bind(this);
         this.handleBeginHarvest = this.handleBeginHarvest.bind(this);
+        this.handleClick = this.handleClick.bind(this);
+        this.handlePaste = this.handlePaste.bind(this);
 
         this.updateDimensions = this.updateDimensions.bind(this);
+
+        this.recordIdRef = React.createRef();
     }
 
     updateDimensions() {
@@ -46,15 +50,15 @@ class TickleRepoIntrospectHarvesting extends React.Component {
     }
 
     handleClearHarvestList(event) {
-        this.setState({showConfirm: true});
+        this.props.setShowDeleteHarvestRecordsConfirmModal(true);
     }
 
     handleRejectClearHarvestList() {
-        this.setState({showConfirm: false})
+        this.props.setShowDeleteHarvestRecordsConfirmModal(false);
     }
 
     handleConfirmClearHarvestList() {
-        this.setState({showConfirm: false})
+        this.props.setShowDeleteHarvestRecordsConfirmModal(false);
         this.props.clearHarvestList();
     }
 
@@ -62,15 +66,37 @@ class TickleRepoIntrospectHarvesting extends React.Component {
         this.props.harvestRecords();
     }
 
+    handleClick() {
+        this.props.addToHarvest([this.recordIdRef.current.value]);
+        this.recordIdRef.current.value = "";
+    }
+
+    handlePaste(event) {
+        let parts = event.clipboardData.getData('Text').split("\n");
+        this.recordIdRef.current.value = "";
+        this.props.addToHarvest(parts);
+        event.preventDefault();
+    }
+
     render() {
         return (
             <div>
+                <div style={{marginBottom: '5px'}}>
+                    <input style={{width: '500px', position:'relative', top:'1px'}}
+                           ref={this.recordIdRef}
+                           onPaste={this.handlePaste}
+                    />
+                    &nbsp;
+                    <Button onClick={this.handleClick}>Add</Button>
+                </div>
                 <div>
-                    // Todo: textarea must handle direct input as well (and paste'd content)
                     <textarea value={this.props.recordsToHarvest.join("\n")}
                               className='record-harvesting'
-                              readOnly={true}
                               rows={this.props.textareaCols}
+                              readOnly
+                              value={this.props.recordsToHarvest.join('\n')}
+                              style={{backgroundColor: '#eeeeee', cursor: 'crosshair '}}
+                              onPaste={this.handlePaste}
                     />
                 </div>
                 <div style={{width: '100%', overflow: 'hidden', marginTop: '4px'}}>
@@ -82,7 +108,7 @@ class TickleRepoIntrospectHarvesting extends React.Component {
                         </Button>
                         <Button onClick={this.handleBeginHarvest}
                                 disabled={this.props.recordsToHarvest.length == 0}
-                                style={{marginLeft: '4px', marginRight: '20px', float: 'right'}}
+                                style={{marginLeft: '4px', marginRight: '40px', float: 'right'}}
                                 variant="primary">
                             Start høstning
                         </Button>
@@ -98,10 +124,10 @@ class TickleRepoIntrospectHarvesting extends React.Component {
                     </Modal.Header>
                     <Modal.Body>Er du sikker på at du vil slette alle record id'er i listen?</Modal.Body>
                     <Modal.Footer>
-                        <Button variant="primary" onClick={this.handleRejectClearHarvestList}>
+                        <Button onClick={this.handleRejectClearHarvestList}>
                             Afbryd
                         </Button>
-                        <Button variant="secondary" onClick={this.handleConfirmClearHarvestList}>
+                        <Button onClick={this.handleConfirmClearHarvestList}>
                             Fortsæt
                         </Button>
                     </Modal.Footer>

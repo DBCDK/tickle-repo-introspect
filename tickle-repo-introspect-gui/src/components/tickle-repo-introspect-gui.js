@@ -51,9 +51,6 @@ class TickleRepoIntrospectGUI extends React.Component {
         this.setNewRecordId = this.setNewRecordId.bind(this);
         this.getRecordFromRecordId = this.getRecordFromRecordId.bind(this);
 
-        this.clearHarvestList = this.clearHarvestList.bind(this);
-        this.harvestRecords = this.harvestRecords.bind(this);
-
         this.handleTabSelect = this.handleTabSelect.bind(this);
         this.handleDataSetChange = this.handleDataSetChange.bind(this);
         this.handleLocalIdChange = this.handleLocalIdChange.bind(this);
@@ -62,14 +59,15 @@ class TickleRepoIntrospectGUI extends React.Component {
         this.handleDatasetSelected = this.handleDatasetSelected.bind(this);
         this.handleEscapeKeyPress = this.handleEscapeKeyPress.bind(this);
         this.handleLocalIdKeyPress = this.handleLocalIdKeyPress.bind(this);
-
         this.handleChangeFormat = this.handleChangeFormat.bind(this);
-        this.handleAddToHarvest = this.handleAddToHarvest.bind(this);
 
         this.setHarvestingTextareaCols = this.setHarvestingTextareaCols.bind(this);
         this.setViewTextareaCols = this.setViewTextareaCols.bind(this);
         this.setShowDeleteHarvestRecordsConfirmModal = this.setShowDeleteHarvestRecordsConfirmModal.bind(this);
         this.setSelectedHarvester = this.setSelectedHarvester.bind(this);
+        this.clearHarvestList = this.clearHarvestList.bind(this);
+        this.harvestRecords = this.harvestRecords.bind(this);
+        this.addToHarvest = this.addToHarvest.bind(this);
 
         this.localIdRef = React.createRef();
     }
@@ -300,13 +298,15 @@ class TickleRepoIntrospectGUI extends React.Component {
         })
     }
 
-    handleAddToHarvest(event) {
-        if( this.state.recordsToHarvest.includes(event.target.value)) {
-            return;
-        }
-        let records = this.state.recordsToHarvest;
-        records.push(event.target.value);
-        this.setState({recordsToHarvest: records});
+    addToHarvest(records) {
+        let recordsToHarvest = this.state.recordsToHarvest;
+        records.forEach( (record) => {
+            record = record.trim();
+            if( record.length > 0 && !recordsToHarvest.includes(record) ) {
+                recordsToHarvest.push(record);
+            }
+        });
+        this.setState({recordsToHarvest: recordsToHarvest});
     }
 
     reset() {
@@ -472,7 +472,8 @@ class TickleRepoIntrospectGUI extends React.Component {
             .then(res => {
                 const harvesters = res.body.harvesters;
                 this.setState({
-                    harvesters: harvesters
+                    harvesters: harvesters,
+                    selectedHarvester: harvesters.length > 0 ? 0 : -1
                 });
             })
             .catch(err => {
@@ -538,7 +539,7 @@ class TickleRepoIntrospectGUI extends React.Component {
                                                 isLineFormatSupported={this.state.isLineFormatSupported}
                                                 isXmlFormatSupported={this.state.isXmlFormatSupported}
                                                 recordsToHarvest={this.state.recordsToHarvest}
-                                                handleAddToHarvest={this.handleAddToHarvest}
+                                                addToHarvest={this.addToHarvest}
                                                 textareaCols={this.state.viewTextareaCols}
                                                 setTextareaCols={this.setViewTextareaCols}/>
                         </Tab>
@@ -551,7 +552,8 @@ class TickleRepoIntrospectGUI extends React.Component {
                                                             textareaCols={this.state.harvestingTextareaCols}
                                                             setTextareaCols={this.setHarvestingTextareaCols}
                                                             showDeleteHarvestRecordsConfirmModal={this.state.showDeleteHarvestRecordsConfirmModal}
-                                                            setShowDeleteHarvestRecordsConfirmModal={this.state.setShowDeleteHarvestRecordsConfirmModal}/>
+                                                            setShowDeleteHarvestRecordsConfirmModal={this.setShowDeleteHarvestRecordsConfirmModal}
+                                                            addToHarvest={this.addToHarvest}/>
                         </Tab>
                     </Tabs>
                 </div>

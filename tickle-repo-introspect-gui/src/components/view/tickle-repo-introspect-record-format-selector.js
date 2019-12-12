@@ -11,7 +11,7 @@ class TickleRepoIntrospectRecordFormatSelector extends React.Component {
     constructor(props) {
         super(props);
 
-        this.recordIdRef = React.createRef();
+        this.handleAddToHarvest = this.handleAddToHarvest.bind(this);
     }
 
     getStatusColor() {
@@ -21,6 +21,10 @@ class TickleRepoIntrospectRecordFormatSelector extends React.Component {
         return this.props.record.status == 'DELETED'
             ? '#ff0000'
             : '#008800';
+    }
+
+    handleAddToHarvest(event) {
+        this.props.addToHarvest([event.target.value]);
     }
 
     render() {
@@ -67,7 +71,7 @@ class TickleRepoIntrospectRecordFormatSelector extends React.Component {
                                    marginRight: '4px'
                                }}/>
                     </ButtonGroup>
-                    <Button onClick={this.props.handleAddToHarvest}
+                    <Button onClick={this.handleAddToHarvest}
                             bsStyle={this.props.recordsToHarvest.includes(this.props.recordId) ? 'default' : 'primary'}
                             id='button-select'
                             value={this.props.recordId}

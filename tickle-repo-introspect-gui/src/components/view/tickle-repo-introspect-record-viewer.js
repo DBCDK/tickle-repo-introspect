@@ -70,7 +70,7 @@ class TickleRepoIntrospectRecordViewer extends React.Component {
                                 isLineFormatSupported={this.props.isLineFormatSupported}
                                 isXmlFormatSupported={this.props.isXmlFormatSupported}
                                 recordsToHarvest={this.props.recordsToHarvest}
-                                handleAddToHarvest={this.props.handleAddToHarvest}/>
+                                addToHarvest={this.props.addToHarvest}/>
                         </div>
                     </div>
                 </div>

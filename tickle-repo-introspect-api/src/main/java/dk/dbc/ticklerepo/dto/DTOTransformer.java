@@ -5,6 +5,7 @@
 
 package dk.dbc.ticklerepo.dto;
 
+import dk.dbc.dataio.harvester.types.TickleRepoHarvesterConfig;
 import dk.dbc.marc.binding.ControlField;
 import dk.dbc.marc.binding.Field;
 import dk.dbc.marc.binding.MarcRecord;
@@ -79,22 +80,23 @@ public class DTOTransformer {
         return dto;
     }
 
-    public static List<HarvesterDTO> harvesterListToDTO(List<String> harvesterList) {
-        final List<HarvesterDTO> dtos = new ArrayList<>();
+    public static List<HarvesterConfigDTO> harvesterListToDTO(List<TickleRepoHarvesterConfig> configs) {
+        final List<HarvesterConfigDTO> dtos = new ArrayList<>();
 
-        for (String harvester : harvesterList) {
-            dtos.add(harvesterToDTO(harvester));
+        for (TickleRepoHarvesterConfig config : configs) {
+            dtos.add(harvesterToDTO(config));
         }
 
         return dtos;
     }
 
-    // Todo: Take harvester config as input, not a simple string
-    public static HarvesterDTO harvesterToDTO(String harvester) {
-        final HarvesterDTO dto = new HarvesterDTO();
+    public static HarvesterConfigDTO harvesterToDTO(TickleRepoHarvesterConfig config) {
+        final HarvesterConfigDTO dto = new HarvesterConfigDTO();
 
-        // Todo: Final type will be a harvesterconfig, not a simpel string
-        dto.setName(harvester);
+        dto.setName(config.getContent().getId());
+        dto.setDataset(config.getContent().getDatasetName());
+        dto.setId(config.getId());
+        dto.setDestination(config.getContent().getDestination());
 
         return dto;
     }

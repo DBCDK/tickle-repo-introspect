@@ -27,7 +27,7 @@ class TickleRepoIntrospectDataioHarvesterSelector extends React.Component {
                                  placeholder="select"
                                  onChange={this.handleOnChange}>
                         {(this.props.harvesters !== undefined ? this.props.harvesters : []).map((harvester, index) =>
-                        <option key={index} value={index}>{harvester.name}</option>)} // Todo: harvester fields may change
+                        <option key={index} value={index}>{harvester.name + " (" + harvester.dataset + " ==> " + harvester.destination + ")"}</option>)}
                     </FormControl>
                 </FormGroup>
             </div>

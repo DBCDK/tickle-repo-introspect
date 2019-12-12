@@ -23,10 +23,14 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
+import dk.dbc.dataio.harvester.types.TickleRepoHarvesterConfig;
+import dk.dbc.dataio.common.utils.flowstore.FlowStoreServiceConnectorException;
+import dk.dbc.dataio.common.utils.flowstore.ejb.FlowStoreServiceConnectorBean;
 
 @Interceptors(StopwatchInterceptor.class)
 @Stateless
@@ -34,6 +38,8 @@ import java.util.Optional;
 public class TickleRepoIntrospectService {
     private static final Logger LOGGER = LoggerFactory.getLogger(TickleRepoIntrospectService.class);
 
+    @EJB
+    FlowStoreServiceConnectorBean flowStoreServiceConnectorBean;
 
     @PersistenceContext(unitName = "tickleRepoPU")
     private EntityManager entityManager;
@@ -124,14 +130,20 @@ public class TickleRepoIntrospectService {
     @Path("harvesters")
     public Response getHarvesters() {
 
-        // Todo: Fetch a list of harvester config's from Dataio, final type is _not_ a simpel string
-        final List<String> harvesters = new ArrayList<String>();
-        harvesters.add("Dataio Harvester A");
-        harvesters.add("Dataio Harvester B");
+        try {
+            List<TickleRepoHarvesterConfig> configs = flowStoreServiceConnectorBean.getConnector().findHarvesterConfigsByType(TickleRepoHarvesterConfig.class);
 
-        final HarvesterListDTO result = new HarvesterListDTO();
-        result.setHarvesters(DTOTransformer.harvesterListToDTO(harvesters));
+            final HarvesterConfigListDTO result = new HarvesterConfigListDTO();
+            result.setHarvesters(DTOTransformer.harvesterListToDTO(configs)
+                    .stream()
+                    .sorted(Comparator.comparing(HarvesterConfigDTO::getName, String.CASE_INSENSITIVE_ORDER))
+                    .collect(Collectors.toList()));
 
-        return Response.ok(result, MediaType.APPLICATION_JSON).build();
+            return Response.ok(result, MediaType.APPLICATION_JSON).build();
+        }
+        catch(FlowStoreServiceConnectorException e) {
+            LOGGER.error("Caught FlowStoreServiceConnectorException: " + e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
+        }
     }
 }

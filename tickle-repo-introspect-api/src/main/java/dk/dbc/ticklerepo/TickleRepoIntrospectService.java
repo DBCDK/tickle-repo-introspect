@@ -5,10 +5,10 @@
 
 package dk.dbc.ticklerepo;
 
-import dk.dbc.dataio.commons.types.AddiMetaData;
 import dk.dbc.dataio.harvester.connector.ejb.TickleHarvesterServiceConnectorBean;
 import dk.dbc.dataio.harvester.task.connector.HarvesterTaskServiceConnectorException;
-import dk.dbc.dataio.harvester.types.*;
+import dk.dbc.dataio.harvester.types.TickleRepoHarvesterConfig;
+import dk.dbc.dataio.harvester.types.HarvestRecordsRequest;
 import dk.dbc.ticklerepo.dto.*;
 import dk.dbc.util.StopwatchInterceptor;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
@@ -21,7 +21,12 @@ import javax.inject.Inject;
 import javax.interceptor.Interceptors;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.ws.rs.*;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;

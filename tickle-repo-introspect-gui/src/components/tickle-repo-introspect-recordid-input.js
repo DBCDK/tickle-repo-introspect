@@ -82,7 +82,8 @@ class TickleRepoIntrospectRecordIdInput extends React.Component {
             </div>
             <TickleRepoIntrospectDataSetList dataSetsForLocalId={this.props.dataSetsForLocalId}
                                              dataSet={this.props.dataSet}
-                                             getWidthOfDataSetField={this.getWidthOfDataSetField}/>
+                                             getWidthOfDataSetField={this.getWidthOfDataSetField}
+                                             handleDataSetSelected={this.props.handleDataSetSelected}/>
             </div>
         );
     }

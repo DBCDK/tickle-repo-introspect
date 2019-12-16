@@ -23,7 +23,7 @@ class TickleRepoIntrospectDataSetList extends React.Component {
                      this.props.dataSetsForLocalId.map((name, index) =>
                      <div key={index}>
                         <a style={{fontWeight: this.props.dataSet == name ? 'bold' : 'normal'}}
-                           onClick={() => { this.handleDatasetSelected(name)}}
+                           onClick={() => { this.props.handleDataSetSelected(name)}}
                            key={index}
                            className={'dataset-list'}>{name}</a>
                      </div>)}

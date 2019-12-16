@@ -54,7 +54,7 @@ class TickleRepoIntrospectGUI extends React.Component {
         this.handleLocalIdChange = this.handleLocalIdChange.bind(this);
         this.handleShowBlanksChecked = this.handleShowBlanksChecked.bind(this);
         this.handleResetLinkClicked = this.handleResetLinkClicked.bind(this);
-        this.handleDatasetSelected = this.handleDatasetSelected.bind(this);
+        this.handleDataSetSelected = this.handleDataSetSelected.bind(this);
         this.handleEscapeKeyPress = this.handleEscapeKeyPress.bind(this);
         this.handleLocalIdKeyPress = this.handleLocalIdKeyPress.bind(this);
         this.handleChangeFormat = this.handleChangeFormat.bind(this);
@@ -289,7 +289,7 @@ class TickleRepoIntrospectGUI extends React.Component {
         }
     }
 
-    handleDatasetSelected(name) {
+    handleDataSetSelected(name) {
         this.setState({
             dataSet: name,
             dataSetsForLocalId: []
@@ -515,7 +515,7 @@ class TickleRepoIntrospectGUI extends React.Component {
                                                        handle={this.handleLocalIdKeyPress}
                                                        localIdRef={this.localIdRef}
                                                        handleLocalIdKeyPress={this.handleLocalIdKeyPress}
-                                                       handleDataSetChange={this.handleDataSetChange}
+                                                       handleDataSetSelected={this.handleDataSetSelected}
                                                        inputMode={this.state.inputMode}/>
                 </div>
                 <div>

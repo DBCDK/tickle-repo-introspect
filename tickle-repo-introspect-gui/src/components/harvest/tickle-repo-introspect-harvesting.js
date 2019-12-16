@@ -72,9 +72,11 @@ class TickleRepoIntrospectHarvesting extends React.Component {
     }
 
     handlePaste(event) {
-        let parts = event.clipboardData.getData('Text').split("\n");
+        let parts = event.clipboardData.getData('Text')
+            .replace(/[;, ]/g,'\n')
+            .split('\n');
         this.recordIdRef.current.value = "";
-        this.props.addToHarvest(parts);
+        this.props.addToHarvest(parts.filter((record) => { return record.trim() != ''}));
         event.preventDefault();
     }
 
@@ -105,7 +107,8 @@ class TickleRepoIntrospectHarvesting extends React.Component {
                               rows={5}
                               readOnly
                               value={this.getRecordsForHarvester(false).join(', ')}
-                              style={{backgroundColor: '#cccccc', cursor: 'no-drop', color: '#aa0000'}}
+                              style={{backgroundColor: '#cccccc', cursor: 'crosshair', color: '#aa0000'}}
+                              onPaste={this.handlePaste}
                               placeholder={'Poster der IKKE kan høstes med den valgte høster'}
                     />
                 </div>

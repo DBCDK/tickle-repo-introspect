@@ -301,7 +301,9 @@ class TickleRepoIntrospectGUI extends React.Component {
         records.forEach( (record) => {
             record = record.trim();
             if( record.length > 0 && !recordsToHarvest.includes(record) ) {
-                recordsToHarvest.push(record);
+                if( record.split(':').length == 2 ) {
+                    recordsToHarvest.push(record);
+                }
             }
         });
         this.setState({recordsToHarvest: recordsToHarvest});

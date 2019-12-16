@@ -78,6 +78,17 @@ class TickleRepoIntrospectHarvesting extends React.Component {
         event.preventDefault();
     }
 
+    getRecordsForHarvester(included) {
+        if( this.props.selectedHarvester >= 0 ) {
+            return this.props.recordsToHarvest.filter((record) => {
+                let result = record.split(":")[0] == this.props.harvesters[this.props.selectedHarvester].dataset;
+                return included ? result : !result;
+            });
+        } else {
+            return [];
+        }
+    }
+
     render() {
         return (
             <div>
@@ -90,13 +101,22 @@ class TickleRepoIntrospectHarvesting extends React.Component {
                     <Button onClick={this.handleClick}>Add</Button>
                 </div>
                 <div>
-                    <textarea value={this.props.recordsToHarvest.join("\n")}
-                              className='record-harvesting'
+                    <textarea className='record-harvesting'
+                              rows={5}
+                              readOnly
+                              value={this.getRecordsForHarvester(false).join(', ')}
+                              style={{backgroundColor: '#cccccc', cursor: 'no-drop', color: '#aa0000'}}
+                              placeholder={'Poster der IKKE kan høstes med den valgte høster'}
+                    />
+                </div>
+                <div>
+                    <textarea className='record-harvesting'
                               rows={this.props.textareaCols}
                               readOnly
-                              value={this.props.recordsToHarvest.join('\n')}
-                              style={{backgroundColor: '#eeeeee', cursor: 'crosshair '}}
+                              value={this.getRecordsForHarvester(true).join('\n')}
+                              style={{backgroundColor: '#eeeeee', cursor: 'crosshair ', color: '#00aa00'}}
                               onPaste={this.handlePaste}
+                              placeholder={"Poster der kan høstes med den valgte høster"}
                     />
                 </div>
                 <div style={{width: '100%', overflow: 'hidden', marginTop: '4px'}}>
@@ -106,16 +126,16 @@ class TickleRepoIntrospectHarvesting extends React.Component {
                                 style={{float: 'right'}}>
                             Tøm listen
                         </Button>
-                        <Button onClick={this.handleBeginHarvest}
-                                disabled={this.props.recordsToHarvest.length == 0}
-                                style={{marginLeft: '4px', marginRight: '40px', float: 'right'}}
-                                variant="primary">
-                            Start høstning
-                        </Button>
-                        <div style={{float: 'right'}}>
+                        <div style={{float: 'left'}}>
                             <TickleRepoIntrospectDataioHarvesterSelector harvesters={this.props.harvesters}
                                                                          setSelectedHarvester={this.props.setSelectedHarvester}/>
                         </div>
+                        <Button onClick={this.handleBeginHarvest}
+                                disabled={this.props.recordsToHarvest.length == 0}
+                                style={{marginLeft: '4px', marginRight: '40px', float: 'left'}}
+                                variant="primary">
+                            Start høstning
+                        </Button>
                     </div>
                 </div>
                 <Modal show={this.props.showDeleteHarvestRecordsConfirmModal} onHide={this.handleRejectClearHarvestList} animation={false}>

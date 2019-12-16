@@ -547,6 +547,7 @@ class TickleRepoIntrospectGUI extends React.Component {
                                                             clearHarvestList={this.clearHarvestList}
                                                             harvesters={this.state.harvesters}
                                                             setSelectedHarvester={this.setSelectedHarvester}
+                                                            selectedHarvester={this.state.selectedHarvester}
                                                             textareaCols={this.state.harvestingTextareaCols}
                                                             setTextareaCols={this.setHarvestingTextareaCols}
                                                             showDeleteHarvestRecordsConfirmModal={this.state.showDeleteHarvestRecordsConfirmModal}

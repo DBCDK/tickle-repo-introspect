@@ -19,6 +19,8 @@ class TickleRepoIntrospectHarvesting extends React.Component {
         this.handleClearHarvestList = this.handleClearHarvestList.bind(this);
         this.handleRejectClearHarvestList = this.handleRejectClearHarvestList.bind(this);
         this.handleConfirmClearHarvestList = this.handleConfirmClearHarvestList.bind(this);
+        this.handleRejectHarvestRecords = this.handleRejectHarvestRecords.bind(this);
+        this.handleConfirmHarvestRecords = this.handleConfirmHarvestRecords.bind(this);
         this.handleBeginHarvest = this.handleBeginHarvest.bind(this);
         this.handleClick = this.handleClick.bind(this);
         this.handlePaste = this.handlePaste.bind(this);
@@ -62,8 +64,17 @@ class TickleRepoIntrospectHarvesting extends React.Component {
         this.props.clearHarvestList();
     }
 
-    handleBeginHarvest(event) {
+    handleRejectHarvestRecords() {
+        this.props.setShowHarvestRecordsConfirmModal(false);
+    }
+
+    handleConfirmHarvestRecords() {
+        this.props.setShowHarvestRecordsConfirmModal(false);
         this.props.harvestRecords();
+    }
+
+    handleBeginHarvest(event) {
+        this.props.setShowHarvestRecordsConfirmModal(true);
     }
 
     handleClick() {
@@ -151,6 +162,20 @@ class TickleRepoIntrospectHarvesting extends React.Component {
                             Afbryd
                         </Button>
                         <Button onClick={this.handleConfirmClearHarvestList}>
+                            Fortsæt
+                        </Button>
+                    </Modal.Footer>
+                </Modal>
+                <Modal show={this.props.showHarvestRecordsConfirmModal} onHide={this.handleRejectHarvestRecords} animation={false}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Tøm listen</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>Send 22 records til høstning?</Modal.Body>
+                    <Modal.Footer>
+                        <Button onClick={this.handleRejectHarvestRecords}>
+                            Afbryd
+                        </Button>
+                        <Button onClick={this.handleConfirmHarvestRecords}>
                             Fortsæt
                         </Button>
                     </Modal.Footer>

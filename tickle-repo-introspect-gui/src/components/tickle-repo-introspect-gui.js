@@ -37,6 +37,7 @@ class TickleRepoIntrospectGUI extends React.Component {
 
             recordsToHarvest: [],
             showDeleteHarvestRecordsConfirmModal: false,
+            showHarvestRecordsConfirmModal: false,
             selectedHarvester: -1,
 
             harvestingTextareaCols: 10,
@@ -62,6 +63,7 @@ class TickleRepoIntrospectGUI extends React.Component {
         this.setHarvestingTextareaCols = this.setHarvestingTextareaCols.bind(this);
         this.setViewTextareaCols = this.setViewTextareaCols.bind(this);
         this.setShowDeleteHarvestRecordsConfirmModal = this.setShowDeleteHarvestRecordsConfirmModal.bind(this);
+        this.setShowHarvestRecordsConfirmModal = this.setShowHarvestRecordsConfirmModal.bind(this);
         this.setSelectedHarvester = this.setSelectedHarvester.bind(this);
         this.clearHarvestList = this.clearHarvestList.bind(this);
         this.harvestRecords = this.harvestRecords.bind(this);
@@ -84,6 +86,10 @@ class TickleRepoIntrospectGUI extends React.Component {
 
     setShowDeleteHarvestRecordsConfirmModal(show) {
         this.setState({showDeleteHarvestRecordsConfirmModal: show});
+    }
+
+    setShowHarvestRecordsConfirmModal(show) {
+        this.setState({showHarvestRecordsConfirmModal: show});
     }
 
     setInitialTab(tab) {
@@ -583,6 +589,8 @@ class TickleRepoIntrospectGUI extends React.Component {
                                                             setTextareaCols={this.setHarvestingTextareaCols}
                                                             showDeleteHarvestRecordsConfirmModal={this.state.showDeleteHarvestRecordsConfirmModal}
                                                             setShowDeleteHarvestRecordsConfirmModal={this.setShowDeleteHarvestRecordsConfirmModal}
+                                                            showHarvestRecordsConfirmModal={this.state.showHarvestRecordsConfirmModal}
+                                                            setShowHarvestRecordsConfirmModal={this.setShowHarvestRecordsConfirmModal}
                                                             addToHarvest={this.addToHarvest}/>
                         </Tab>
                     </Tabs>

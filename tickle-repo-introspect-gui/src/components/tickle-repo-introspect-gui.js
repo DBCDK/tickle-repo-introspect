@@ -494,18 +494,39 @@ class TickleRepoIntrospectGUI extends React.Component {
         // Select the set of records to harvest with the selected harvester
         let harvester = this.state.harvesters[this.state.selectedHarvester];
         let records = this.state.recordsToHarvest.filter((record) => {
-            return record.split(":")[0] == harvester.dataSet;
+            return record.split(":")[0] == harvester.dataset;
         });
 
-        // Todo: Start a harvest
-        console.log("Todo: harvest records with harvester '" + harvester.name + "'");
-        console.log(records);
+        // Compose request
+        let req =
+        {
+            requests: [
+                {
+                    harvesterid: harvester.id,
+                    recordIds: records
+                }
+            ]
+        };
 
-        // Remove those records we sent to harvesting
-        let remaining = this.state.recordsToHarvest.filter((record) => {
-            return record.split(":")[0] != harvester.dataset;
-        });
-        this.setState({recordsToHarvest: remaining});
+        // Send the harvest request.
+        // If the request succeeds, then remove those recordids that have been added to the harvest request.
+        // We always, only, send a request for a single harvester so we know that if we have a
+        // request in the response dto, then its the current request - we dont need to check the harvester id.
+        request
+            .post('/api/v1/harvesters/request')
+            .set('Content-Type', 'application/json')
+            .send(req)
+            .then(res => {
+                if( res.body.requests.length > 0 ) {
+                    let remaining = this.state.recordsToHarvest.filter((record) => {
+                        return !res.body.requests[0].recordIds.includes(record);
+                    });
+                    this.setState({recordsToHarvest: remaining});
+                }
+            })
+            .catch(err => {
+                alert(err.message);
+            });
     }
 
     clearHarvestList() {
@@ -520,7 +541,7 @@ class TickleRepoIntrospectGUI extends React.Component {
                     <TickleRepoIntrospectRecordIdInput dataSet={this.state.dataSet}
                                                        dataSetsForLocalId={this.state.dataSetsForLocalId}
                                                        localId={this.state.localId}
-                                                       handleDatasetChange={this.handleDataSetChange}
+                                                       handleDataSetChange={this.handleDataSetChange}
                                                        handleLocalIdChange={this.handleLocalIdChange}
                                                        handle={this.handleLocalIdKeyPress}
                                                        localIdRef={this.localIdRef}

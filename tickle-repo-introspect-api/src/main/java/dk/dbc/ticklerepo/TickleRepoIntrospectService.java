@@ -40,6 +40,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -171,11 +172,14 @@ public class TickleRepoIntrospectService {
     @Path("harvesters/request")
     public Response addHarvestRequest(HarvesterRequestListDTO requestList) {
 
+        final ArrayList<HarvestRequestDTO> successfull = new ArrayList<>();
+
         for( HarvestRequestDTO dto : requestList.getRequests() ) {
             try {
                 HarvestRecordsRequest request = DTOTransformer.HarvestRequestFromDTO(dto);
                 tickleHarvesterServiceConnectorBean.getConnector().createHarvestTask(dto.getHarvesterid(), request);
                 LOGGER.info("Created harvest task for harvester " + dto.getHarvesterid() + " with " + request.getRecords().size() + " records");
+                successfull.add(dto);
             }
             catch(HarvestRequestDTOException he) {
                 LOGGER.error("Failed to create HarvestRequest from dto: " + he.getMessage());
@@ -188,6 +192,9 @@ public class TickleRepoIntrospectService {
             }
         }
 
-        return Response.ok().build();
+        final HarvesterRequestListDTO result = new HarvesterRequestListDTO();
+        result.setRequests(successfull);
+
+        return Response.ok(result).build();
     }
 }

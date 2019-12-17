@@ -142,10 +142,13 @@ class TickleRepoIntrospectHarvesting extends React.Component {
                         </Button>
                         <div style={{float: 'left'}}>
                             <TickleRepoIntrospectDataioHarvesterSelector harvesters={this.props.harvesters}
+                                                                         selectedHarvester={this.props.selectedHarvester}
                                                                          setSelectedHarvester={this.props.setSelectedHarvester}/>
                         </div>
                         <Button onClick={this.handleBeginHarvest}
-                                disabled={this.props.recordsToHarvest.length == 0}
+                                disabled={this.props.recordsToHarvest.length == 0 || (this.props.selectedHarvester >= 0
+                                    ? !this.props.harvesters[this.props.selectedHarvester].enabled
+                                    : true)}
                                 style={{marginLeft: '4px', marginRight: '40px', float: 'left'}}
                                 variant="primary">
                             Start høstning

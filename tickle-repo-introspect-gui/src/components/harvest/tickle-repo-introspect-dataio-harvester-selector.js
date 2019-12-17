@@ -25,9 +25,16 @@ class TickleRepoIntrospectDataioHarvesterSelector extends React.Component {
                 <FormGroup controlId="formControlsSelect">
                     <FormControl componentClass="select"
                                  placeholder="select"
-                                 onChange={this.handleOnChange}>
-                        {(this.props.harvesters !== undefined ? this.props.harvesters : []).map((harvester, index) =>
-                        <option key={index} value={index}>{harvester.name + " (" + harvester.dataset + " ==> " + harvester.destination + ")"}</option>)}
+                                 onChange={this.handleOnChange}
+                                 style={{backgroundColor: this.props.harvesters !== undefined && this.props.selectedHarvester >= 0
+                                         ? (this.props.harvesters[this.props.selectedHarvester].enabled ? '#00ff00' : '#ff0000')
+                                         : '#ffffff'}}>
+                        {
+                            (this.props.harvesters !== undefined ? this.props.harvesters : []).map((harvester, index) =>
+                            <option key={index} value={index}>
+                                {harvester.name + " (" + harvester.dataset + " ==> " + harvester.destination + ")" + (harvester.enabled ? "" : "  DISABLED")}
+                            </option>)
+                        }
                     </FormControl>
                 </FormGroup>
             </div>

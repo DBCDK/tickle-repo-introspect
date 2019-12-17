@@ -7,6 +7,8 @@ public class HarvesterConfigDTO {
     private String dataset;
     private String destination;
 
+    private boolean enabled;
+
     public String getName() {
         return name;
     }
@@ -37,5 +39,13 @@ public class HarvesterConfigDTO {
 
     public void setDestination(String destination) {
         this.destination = destination;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 }

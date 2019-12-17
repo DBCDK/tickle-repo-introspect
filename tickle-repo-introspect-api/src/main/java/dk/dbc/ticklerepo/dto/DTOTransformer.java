@@ -100,6 +100,7 @@ public class DTOTransformer {
         dto.setDataset(config.getContent().getDatasetName());
         dto.setId(config.getId());
         dto.setDestination(config.getContent().getDestination());
+        dto.setEnabled(config.getContent().isEnabled());
 
         return dto;
     }

@@ -18,6 +18,14 @@ class TickleRepoIntrospectDataioHarvesterSelector extends React.Component {
         this.props.setSelectedHarvester(event.target.value);
     }
 
+    isEnabled(index) {
+        if( this.props.harvesters !== undefined && this.props.selectedHarvester >= 0 ) {
+            return this.props.harvesters[index].enabled
+        } else {
+            return false;
+        }
+    }
+
     render() {
 
         return (
@@ -26,12 +34,10 @@ class TickleRepoIntrospectDataioHarvesterSelector extends React.Component {
                     <FormControl componentClass="select"
                                  placeholder="select"
                                  onChange={this.handleOnChange}
-                                 style={{backgroundColor: this.props.harvesters !== undefined && this.props.selectedHarvester >= 0
-                                         ? (this.props.harvesters[this.props.selectedHarvester].enabled ? '#00ff00' : '#ff0000')
-                                         : '#ffffff'}}>
+                                 className={this.isEnabled(this.props.selectedHarvester) ? 'enabled-background' : 'disabled-background'}>
                         {
                             (this.props.harvesters !== undefined ? this.props.harvesters : []).map((harvester, index) =>
-                            <option key={index} value={index}>
+                            <option key={index} value={index} className={this.isEnabled(index) ? 'enabled-text' : 'disabled-text'}>
                                 {harvester.name + " (" + harvester.dataset + " ==> " + harvester.destination + ")" + (harvester.enabled ? "" : "  DISABLED")}
                             </option>)
                         }

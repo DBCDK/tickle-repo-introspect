@@ -40,3 +40,23 @@ textarea {
 textarea.record-harvesting {
     letterSpacing: 0px;
 }
+
+.enabled-background {
+    background-color: #00ff00;
+    color: #000000;
+}
+
+.disabled-background {
+    background-color: #ff0000;
+    color: #000000;
+}
+
+.enabled-text {
+    background-color: #ffffff;
+    color: #00aa00;
+}
+
+.disabled-text {
+    background-color: #ffffff;
+    color: #ff0000;
+}

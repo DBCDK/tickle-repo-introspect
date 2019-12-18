@@ -4,6 +4,7 @@
  */
 
 import React from "react";
+
 import TickleRepoIntrospectDataSetList from "./tickle-repo-introspect-dataset-list";
 import * as Constants from './tickle-repo-introspect-constants';
 
@@ -46,25 +47,18 @@ class TickleRepoIntrospectRecordIdInput extends React.Component {
             <div>
             <label className={'recordId-label'}
                    style={{marginLeft: '5px', marginRight: '20px', float: 'left'}}>
-                <input type="text"
+                <input type='text'
+                       className='recordid-input'
                        value={this.props.dataSet}
                        onChange={this.props.handleDataSetChange}
-                       style={{
-                           width: this.getWidthOfDataSetField(),
-                           fontFamily: 'Courier New',
-                           fontSize: Constants.FONT_SIZE + 'px',
-                           color: this.getLocalIdColor()
-                       }}
+                       style={{width: this.getWidthOfDataSetField(), color: this.getLocalIdColor()}}
                        placeholder={'data sæt'}/>
                 &nbsp;:&nbsp;
-                <input type="text"
+                <input type='text'
+                       className='recordid-input'
                        value={this.props.localId}
                        onChange={this.props.handleLocalIdChange}
-                       style={{
-                           width: this.getWidthOfLocalidField(),
-                           fontFamily: 'Courier New',
-                           fontSize: Constants.FONT_SIZE + 'px'
-                       }}
+                       style={{width: this.getWidthOfLocalidField()}}
                        autoFocus
                        ref={this.props.localIdRef}
                        placeholder={'lokal id'}
@@ -74,15 +68,22 @@ class TickleRepoIntrospectRecordIdInput extends React.Component {
                 paddingTop: '5px',
                 fontSize: 'smaller'
             }}>
+
                 <u>escape</u>: Nulstil siden
-                &nbsp; &nbsp;
-                <u>pil op/ned</u>: Vælg datasæt
-                &nbsp; &nbsp;
-                <u>enter</u>: Vælg og luk datasætvælger
+                {this.props.dataSetsForLocalId.length > 1 ?
+                    <span>
+                        &nbsp; &nbsp;
+                        <u>pil op/ned</u>: Vælg datasæt
+                        &nbsp; &nbsp;
+                        <u>enter</u>: Vælg og luk datasætvælger
+                    </span>
+                    : ''
+                }
             </div>
             <TickleRepoIntrospectDataSetList dataSetsForLocalId={this.props.dataSetsForLocalId}
                                              dataSet={this.props.dataSet}
-                                             getWidthOfDataSetField={this.getWidthOfDataSetField}/>
+                                             getWidthOfDataSetField={this.getWidthOfDataSetField}
+                                             handleDataSetSelected={this.props.handleDataSetSelected}/>
             </div>
         );
     }

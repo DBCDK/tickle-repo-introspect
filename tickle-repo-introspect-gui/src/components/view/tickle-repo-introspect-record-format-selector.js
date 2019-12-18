@@ -11,7 +11,20 @@ class TickleRepoIntrospectRecordFormatSelector extends React.Component {
     constructor(props) {
         super(props);
 
-        this.recordIdRef = React.createRef();
+        this.handleAddToHarvest = this.handleAddToHarvest.bind(this);
+    }
+
+    getStatusColor() {
+        if( this.props.record == null ) {
+            return '#666666';
+        }
+        return this.props.record.status == 'DELETED'
+            ? '#ff0000'
+            : '#008800';
+    }
+
+    handleAddToHarvest(event) {
+        this.props.addToHarvest([event.target.value]);
     }
 
     render() {
@@ -49,18 +62,20 @@ class TickleRepoIntrospectRecordFormatSelector extends React.Component {
                         </ToggleButtonGroup>
                         : ''
                     }
-                    <span style={{
-                        marginLeft: '50px'
-                    }}>
-                        record id: <input value={this.props.recordId != '' ? this.props.recordId : '(ikke valgt)'}
-                    readOnly={true}/>
-                        &nbsp; &nbsp;
-                        {this.props.record != null
-                            ? <span style={{color: this.props.record.status == 'DELETED'
-                                    ? '#ff0000'
-                                    : '#008800'}}>{this.props.record.status}</span>
-                            : ''}
-                    </span>
+                    <ButtonGroup id='button-tool-bar-format'
+                                 style={{marginLeft: '50px'}}>
+                        <input value={this.props.recordId != '' ? this.props.recordId : '(ikke valgt)'}
+                               readOnly={true}
+                               style={{
+                                   color: this.getStatusColor(),
+                                   marginRight: '4px'
+                               }}/>
+                    </ButtonGroup>
+                    <Button onClick={this.handleAddToHarvest}
+                            bsStyle={this.props.recordsToHarvest.includes(this.props.recordId) ? 'default' : 'primary'}
+                            id='button-select'
+                            value={this.props.recordId}
+                            disabled={!this.props.recordLoaded}>Tilføj til høstning</Button>
                 </div>
             </div>
         )

@@ -4,26 +4,21 @@
  */
 
 import React from "react";
-import RawrepoIntrospectRecordFormatSelector from './tickle-repo-introspect-record-format-selector';
-import { dateFormatter } from './tickle-repo-introspect-date-formatter'
-import * as Constants from './tickle-repo-introspect-constants';
+
+import TickleRepoIntrospectRecordFormatSelector from './tickle-repo-introspect-record-format-selector';
+import { dateFormatter } from '../tickle-repo-introspect-date-formatter'
+import * as Constants from '../tickle-repo-introspect-constants';
 
 class TickleRepoIntrospectRecordViewer extends React.Component {
 
     constructor(props) {
         super(props);
 
-        this.state = {
-            textareaCols: this.availableRows()
-        };
-
         this.updateDimensions = this.updateDimensions.bind(this);
     }
 
     updateDimensions() {
-        this.setState({
-            textareaCols: this.availableRows()
-        });
+        this.props.setTextareaCols(this.availableRows());
     };
 
     availableRows() {
@@ -61,9 +56,9 @@ class TickleRepoIntrospectRecordViewer extends React.Component {
         return (
             <div>
                 <div style={{width: '100%', overflow: 'hidden'}}>
-                    <div className='form-group' style={{height: '28px'}}>
+                    <div style={{height: '28px'}}>
                         <div style={{float: 'left'}}>
-                            <RawrepoIntrospectRecordFormatSelector
+                            <TickleRepoIntrospectRecordFormatSelector
                                 id='record-format-selector'
                                 format={this.props.format}
                                 record={this.props.record}
@@ -73,7 +68,9 @@ class TickleRepoIntrospectRecordViewer extends React.Component {
                                 showBlanks={this.props.showBlanks}
                                 handleShowBlanksChecked={this.props.handleShowBlanksChecked}
                                 isLineFormatSupported={this.props.isLineFormatSupported}
-                                isXmlFormatSupported={this.props.isXmlFormatSupported}/>
+                                isXmlFormatSupported={this.props.isXmlFormatSupported}
+                                recordsToHarvest={this.props.recordsToHarvest}
+                                addToHarvest={this.props.addToHarvest}/>
                         </div>
                     </div>
                 </div>
@@ -90,23 +87,12 @@ class TickleRepoIntrospectRecordViewer extends React.Component {
                     </div>
                     : ''
                 }
-                <div className="flex-container">
+                <div>
                     <textarea value={ this.getRecordForSelectedFormat() }
                               readOnly={true}
-                              style={{
-                                  width: '100%',
-                                  fontFamily: 'Courier New',
-                                  fontSize: Constants.VIEW_FONT_SIZE + 'px',
-                                  fontWeight: '500',
-                                  lineHeight: Constants.VIEW_LINE_HEIGHT + 'px',
-                                  resize: 'none',
-                                  backgroundColor: '#ffffff',
-                                  color: this.props.textColor,
-                                  border: 'solid 1px #aaaaaa',
-                                  whiteSpace: 'pre',
-                                  letterSpacing: this.props.showBlanks && this.props.format == 'LINE' ? '2px' : '0px'
-                              }}
-                              rows={this.state.textareaCols}
+                              className='record-viewer'
+                              style={{letterSpacing: this.props.showBlanks && this.props.format == 'LINE' ? '2px' : '0px'}}
+                              rows={this.props.textareaCols}
                     />
                 </div>
             </div>

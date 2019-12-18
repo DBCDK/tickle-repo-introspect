@@ -5,6 +5,10 @@
 
 package dk.dbc.ticklerepo.dto;
 
+import dk.dbc.dataio.commons.types.AddiMetaData;
+import dk.dbc.dataio.harvester.types.HarvestRecordsRequest;
+import dk.dbc.dataio.harvester.types.HarvestRequest;
+import dk.dbc.dataio.harvester.types.TickleRepoHarvesterConfig;
 import dk.dbc.marc.binding.ControlField;
 import dk.dbc.marc.binding.Field;
 import dk.dbc.marc.binding.MarcRecord;
@@ -77,6 +81,41 @@ public class DTOTransformer {
         dto.setContentRaw(recordDataToRaw(record.getContent()));
 
         return dto;
+    }
+
+    public static List<HarvesterConfigDTO> harvesterListToDTO(List<TickleRepoHarvesterConfig> configs) {
+        final List<HarvesterConfigDTO> dtos = new ArrayList<>();
+
+        for (TickleRepoHarvesterConfig config : configs) {
+            dtos.add(harvesterToDTO(config));
+        }
+
+        return dtos;
+    }
+
+    public static HarvesterConfigDTO harvesterToDTO(TickleRepoHarvesterConfig config) {
+        final HarvesterConfigDTO dto = new HarvesterConfigDTO();
+
+        dto.setName(config.getContent().getId());
+        dto.setDataset(config.getContent().getDatasetName());
+        dto.setId(config.getId());
+        dto.setDestination(config.getContent().getDestination());
+        dto.setEnabled(config.getContent().isEnabled());
+
+        return dto;
+    }
+
+    public static HarvestRecordsRequest HarvestRequestFromDTO(HarvestRequestDTO dto) throws HarvestRequestDTOException {
+        List<AddiMetaData> requests = new ArrayList<>();
+
+        for( String recordId : dto.getRecordIds() ) {
+            String[] parts = recordId.split(":");
+            if( parts.length != 2 ) {
+                throw new HarvestRequestDTOException("Invalid record id '" + recordId + "' in request for harvester id " + dto.getHarvesterid());
+            }
+            requests.add(new AddiMetaData().withBibliographicRecordId(parts[1]));
+        }
+        return new HarvestRecordsRequest(requests);
     }
 
     private static String recordDataToLine(byte[] content) {

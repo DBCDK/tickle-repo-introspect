@@ -5,6 +5,8 @@
 
 import React from "react";
 
+export const HARVEST_HEIGHT_OFFSET = 450;
+export const HARVEST_LINE_HEIGHT = 22;
 export const VIEW_HEIGHT_OFFSET = 280;
 export const VIEW_LINE_HEIGHT = 22;
 export const FONT_SIZE = 14;

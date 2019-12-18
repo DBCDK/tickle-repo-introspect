@@ -10,6 +10,8 @@ docker run --rm --name tickle-repo-introspect -d \
     -e JAVA_MAX_HEAP_SIZE=2G \
     -e INSTANCE=devel \
     -e TICKLE_REPO_URL=${TICKLE_REPO_URL} \
+    -e FLOWSTORE_URL=${FLOWSTORE_URL} \
+    -e TICKLE_REPO_HARVESTER_URL=${TICKLE_REPO_HARVESTER_URL} \
     -p ${tickle_repo_introspect_service_port}:8080 \
     docker-io.dbc.dk/tickle-repo-introspect:devel
 

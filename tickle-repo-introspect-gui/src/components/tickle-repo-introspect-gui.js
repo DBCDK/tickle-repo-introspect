@@ -5,11 +5,14 @@
 
 import React from "react";
 import {Tab, Tabs} from "react-bootstrap";
-import DataSetSummaryList from "./tickle-repo-introspect-dataset-summary-list";
-import TickleRepoIntrospectRecordViewer from "./tickle-repo-introspect-record-viewer";
-import TickleRepoIntrospectRecordIdInput from "./tickle-repo-introspect-recordid-input";
 import queryString from 'query-string'
+
+import TickleRepoIntrospectOverview from "./overview/tickle-repo-introspect-overview";
+import TickleRepoIntrospectRecordViewer from "./view/tickle-repo-introspect-record-viewer";
+import TickleRepoIntrospectRecordIdInput from "./tickle-repo-introspect-recordid-input";
+import TickleRepoIntrospectHarvesting from "./harvest/tickle-repo-introspect-harvesting";
 import * as Constants from './tickle-repo-introspect-constants';
+
 const request = require('superagent');
 
 class TickleRepoIntrospectGUI extends React.Component {
@@ -20,16 +23,25 @@ class TickleRepoIntrospectGUI extends React.Component {
         this.state = {
             view: 'overblik',
             instance: '',
+
             record: null,
             recordLoaded: false,
+
             dataSet: '',
             localId: '',
             recordId: '',
             format: '',
             showBlanks: false,
-            recordIdWidth: 0,
             dataSetsForLocalId: [],
-            inputMode: Constants.INPUT_MODE.LOCALID_WITH_LOOKUP
+            inputMode: Constants.INPUT_MODE.LOCALID_WITH_LOOKUP,
+
+            recordsToHarvest: [],
+            showDeleteHarvestRecordsConfirmModal: false,
+            showHarvestRecordsConfirmModal: false,
+            selectedHarvester: -1,
+
+            harvestingTextareaCols: 10,
+            viewTextareaCols: 10
         };
 
         this.getInstance = this.getInstance.bind(this);
@@ -41,44 +53,43 @@ class TickleRepoIntrospectGUI extends React.Component {
         this.handleTabSelect = this.handleTabSelect.bind(this);
         this.handleDataSetChange = this.handleDataSetChange.bind(this);
         this.handleLocalIdChange = this.handleLocalIdChange.bind(this);
-        this.handleChangeFormat = this.handleChangeFormat.bind(this);
         this.handleShowBlanksChecked = this.handleShowBlanksChecked.bind(this);
         this.handleResetLinkClicked = this.handleResetLinkClicked.bind(this);
-        this.handleDatasetSelected = this.handleDatasetSelected.bind(this);
-
+        this.handleDataSetSelected = this.handleDataSetSelected.bind(this);
         this.handleEscapeKeyPress = this.handleEscapeKeyPress.bind(this);
         this.handleLocalIdKeyPress = this.handleLocalIdKeyPress.bind(this);
+        this.handleChangeFormat = this.handleChangeFormat.bind(this);
+
+        this.setHarvestingTextareaCols = this.setHarvestingTextareaCols.bind(this);
+        this.setViewTextareaCols = this.setViewTextareaCols.bind(this);
+        this.setShowDeleteHarvestRecordsConfirmModal = this.setShowDeleteHarvestRecordsConfirmModal.bind(this);
+        this.setShowHarvestRecordsConfirmModal = this.setShowHarvestRecordsConfirmModal.bind(this);
+        this.setSelectedHarvester = this.setSelectedHarvester.bind(this);
+        this.clearHarvestList = this.clearHarvestList.bind(this);
+        this.harvestRecords = this.harvestRecords.bind(this);
+        this.addToHarvest = this.addToHarvest.bind(this);
 
         this.localIdRef = React.createRef();
     }
 
-    handleEscapeKeyPress(event){
-        if(event.keyCode === 27) {
-            this.reset();
-        }
+    setHarvestingTextareaCols(cols) {
+        this.setState({harvestingTextareaCols: cols});
     }
 
-    handleLocalIdKeyPress(event){
+    setViewTextareaCols(cols) {
+        this.setState({viewTextareaCols: cols});
+    }
 
-        // Arrow up-down: Select a dataset when  multiple sets are available
-        if(event.keyCode === 38 || event.keyCode === 40) { // up-down
-            if( this.state.dataSetsForLocalId.length > 0 ) {
-                let curr = this.state.dataSetsForLocalId.indexOf(this.state.dataSet);
-                if( event.keyCode === 38 && curr > 0 ) {
-                    this.setState({dataSet: this.state.dataSetsForLocalId[curr - 1]});
-                    this.setNewRecordId(this.state.dataSet + ':' + this.state.localId);
-                }
-                if( event.keyCode === 40 && curr < this.state.dataSetsForLocalId.length - 1 ) {
-                    this.setState({dataSet: this.state.dataSetsForLocalId[curr + 1]});
-                    this.setNewRecordId(this.state.dataSet + ':' + this.state.localId);
-                }
-            }
-        }
+    setSelectedHarvester(index) {
+        this.setState({selectedHarvester: index});
+    }
 
-        // enter: Close select div for multiple datasets
-        if(event.keyCode === 13) {
-            this.setState({dataSetsForLocalId: []});
-        }
+    setShowDeleteHarvestRecordsConfirmModal(show) {
+        this.setState({showDeleteHarvestRecordsConfirmModal: show});
+    }
+
+    setShowHarvestRecordsConfirmModal(show) {
+        this.setState({showHarvestRecordsConfirmModal: show});
     }
 
     setInitialTab(tab) {
@@ -98,15 +109,23 @@ class TickleRepoIntrospectGUI extends React.Component {
         if (this.state.instance === '') {
             this.getInstance();
         }
+
+        // Fetch a list of defined datasets (sources)
         if (this.state.datasets === undefined) {
             // List can be empty, hence no default 'datasets' in state
             this.getDatasets();
         }
 
+        // Fetch a list of defined tickle-harvester
+        if (this.state.harvesters === undefined) {
+            // List can be empty, hence no default 'harvesters' in state
+            this.getHarvesters();
+        }
+
         // Check for initial values from the querystring
         const queryParams = queryString.parse(location.search);
         let recordId = queryParams["recordId"] !== undefined ? queryParams["recordId"] : this.state.recordId;
-        if( queryParams['tab'] === undefined || !["overblik", "visning"].includes(queryParams['tab']) ) {
+        if( queryParams['tab'] === undefined || !["overblik", "visning", 'harvest'].includes(queryParams['tab']) ) {
             this.redirectToUrlWithParams('overblik', recordId);
         } else {
             this.setInitialTab(queryParams["tab"], recordId);
@@ -138,6 +157,35 @@ class TickleRepoIntrospectGUI extends React.Component {
             window.history.replaceState('', document.title, params);
         } else {
             location.search = params;
+        }
+    }
+
+    handleEscapeKeyPress(event){
+        if(event.keyCode === 27) {
+            this.reset();
+        }
+    }
+
+    handleLocalIdKeyPress(event){
+
+        // Arrow up-down: Select a dataset when  multiple sets are available
+        if(event.keyCode === 38 || event.keyCode === 40) { // up-down
+            if( this.state.dataSetsForLocalId.length > 0 ) {
+                let curr = this.state.dataSetsForLocalId.indexOf(this.state.dataSet);
+                if( event.keyCode === 38 && curr > 0 ) {
+                    this.setState({dataSet: this.state.dataSetsForLocalId[curr - 1]});
+                    this.setNewRecordId(this.state.dataSet + ':' + this.state.localId);
+                }
+                if( event.keyCode === 40 && curr < this.state.dataSetsForLocalId.length - 1 ) {
+                    this.setState({dataSet: this.state.dataSetsForLocalId[curr + 1]});
+                    this.setNewRecordId(this.state.dataSet + ':' + this.state.localId);
+                }
+            }
+        }
+
+        // enter: Close select div for multiple datasets
+        if(event.keyCode === 13) {
+            this.setState({dataSetsForLocalId: []});
         }
     }
 
@@ -247,22 +295,35 @@ class TickleRepoIntrospectGUI extends React.Component {
         }
     }
 
-    handleDatasetSelected(name) {
+    handleDataSetSelected(name) {
         this.setState({
             dataSet: name,
             dataSetsForLocalId: []
         })
     }
 
+    addToHarvest(records) {
+        let recordsToHarvest = this.state.recordsToHarvest;
+        records.forEach( (record) => {
+            record = record.trim();
+            if( record.length > 0 && !recordsToHarvest.includes(record) ) {
+                if( record.split(':').length == 2 ) {
+                    recordsToHarvest.push(record);
+                }
+            }
+        });
+        this.setState({recordsToHarvest: recordsToHarvest});
+    }
+
     reset() {
         this.setState({
+            record: null,
+            recordLoaded: false,
+
             localId: '',
             dataSet: '',
             recordId: '',
-            recordIdWidth: 0,
-            record: null,
             format: '',
-            recordLoaded: false,
             inputMode: Constants.INPUT_MODE.LOCALID_WITH_LOOKUP,
             dataSetsForLocalId: []
         });
@@ -410,25 +471,88 @@ class TickleRepoIntrospectGUI extends React.Component {
         }
     }
 
+    getHarvesters() {
+        request
+            .get('/api/v1/harvesters')
+            .set('Accepts', 'application/json')
+            .then(res => {
+                const harvesters = res.body.harvesters;
+                this.setState({
+                    harvesters: harvesters,
+                    selectedHarvester: harvesters.length > 0 ? 0 : -1
+                });
+            })
+            .catch(err => {
+                alert(err.message);
+            });
+    }
+
     getBaseUrl() {
         let parts = window.location.toString().split("?");
         return parts.length > 0 ? parts[0] : window.location;
     }
 
+    harvestRecords() {
+        if( this.state.selectedHarvester == -1 ) {
+            return;
+        }
+
+        // Select the set of records to harvest with the selected harvester
+        let harvester = this.state.harvesters[this.state.selectedHarvester];
+        let records = this.state.recordsToHarvest.filter((record) => {
+            return record.split(":")[0] == harvester.dataset;
+        });
+
+        // Compose request
+        let req =
+        {
+            requests: [
+                {
+                    harvesterid: harvester.id,
+                    recordIds: records
+                }
+            ]
+        };
+
+        // Send the harvest request.
+        // If the request succeeds, then remove those recordids that have been added to the harvest request.
+        // We always, only, send a request for a single harvester so we know that if we have a
+        // request in the response dto, then its the current request - we dont need to check the harvester id.
+        request
+            .post('/api/v1/harvesters/request')
+            .set('Content-Type', 'application/json')
+            .send(req)
+            .then(res => {
+                if( res.body.requests.length > 0 ) {
+                    let remaining = this.state.recordsToHarvest.filter((record) => {
+                        return !res.body.requests[0].recordIds.includes(record);
+                    });
+                    this.setState({recordsToHarvest: remaining});
+                }
+            })
+            .catch(err => {
+                alert(err.message);
+            });
+    }
+
+    clearHarvestList() {
+        this.setState({recordsToHarvest: []})
+    }
+
     render() {
         return (
             <div style={{width: '100%', overflow: 'hidden'}}>
-                <h2><a href={this.getBaseUrl()} onClick={this.handleResetLinkClicked}>Tickle Repo</a> <b>{this.state.instance}</b> - {this.state.datasets == undefined ? 0 : this.state.datasets.length} kilder</h2>
+                <h2><a href={this.getBaseUrl()} onClick={this.handleResetLinkClicked}>Tickle Repo</a> <b>{this.state.instance}</b> - {this.state.datasets === undefined ? 0 : this.state.datasets.length} kilder</h2>
                 <div style={{marginBottom: '60px'}}>
                     <TickleRepoIntrospectRecordIdInput dataSet={this.state.dataSet}
                                                        dataSetsForLocalId={this.state.dataSetsForLocalId}
                                                        localId={this.state.localId}
-                                                       handleDatasetChange={this.handleDataSetChange}
+                                                       handleDataSetChange={this.handleDataSetChange}
                                                        handleLocalIdChange={this.handleLocalIdChange}
                                                        handle={this.handleLocalIdKeyPress}
                                                        localIdRef={this.localIdRef}
                                                        handleLocalIdKeyPress={this.handleLocalIdKeyPress}
-                                                       handleDataSetChange={this.handleDataSetChange}
+                                                       handleDataSetSelected={this.handleDataSetSelected}
                                                        inputMode={this.state.inputMode}/>
                 </div>
                 <div>
@@ -437,7 +561,7 @@ class TickleRepoIntrospectGUI extends React.Component {
                           animation={false}
                           id="tabs">
                         <Tab eventKey={'overblik'} title="Overblik" style={{margin: '10px'}}>
-                            <DataSetSummaryList datasets={this.state.datasets}/>
+                            <TickleRepoIntrospectOverview datasets={this.state.datasets}/>
                         </Tab>
                         <Tab eventKey={'visning'} title="Visning" style={{margin: '10px'}}>
                             <TickleRepoIntrospectRecordViewer record={this.state.record}
@@ -445,11 +569,29 @@ class TickleRepoIntrospectGUI extends React.Component {
                                                 recordLoaded={this.state.recordLoaded}
                                                 format={this.state.format}
                                                 handleChangeFormat={this.handleChangeFormat}
-                                                textColor='#000000'
                                                 showBlanks={this.state.showBlanks}
                                                 handleShowBlanksChecked={this.handleShowBlanksChecked}
                                                 isLineFormatSupported={this.state.isLineFormatSupported}
-                                                isXmlFormatSupported={this.state.isXmlFormatSupported}/>
+                                                isXmlFormatSupported={this.state.isXmlFormatSupported}
+                                                recordsToHarvest={this.state.recordsToHarvest}
+                                                addToHarvest={this.addToHarvest}
+                                                textareaCols={this.state.viewTextareaCols}
+                                                setTextareaCols={this.setViewTextareaCols}/>
+                        </Tab>
+                        <Tab eventKey={'harvest'} title="Høstning" style={{margin: '10px'}}>
+                            <TickleRepoIntrospectHarvesting recordsToHarvest={this.state.recordsToHarvest}
+                                                            harvestRecords={this.harvestRecords}
+                                                            clearHarvestList={this.clearHarvestList}
+                                                            harvesters={this.state.harvesters}
+                                                            setSelectedHarvester={this.setSelectedHarvester}
+                                                            selectedHarvester={this.state.selectedHarvester}
+                                                            textareaCols={this.state.harvestingTextareaCols}
+                                                            setTextareaCols={this.setHarvestingTextareaCols}
+                                                            showDeleteHarvestRecordsConfirmModal={this.state.showDeleteHarvestRecordsConfirmModal}
+                                                            setShowDeleteHarvestRecordsConfirmModal={this.setShowDeleteHarvestRecordsConfirmModal}
+                                                            showHarvestRecordsConfirmModal={this.state.showHarvestRecordsConfirmModal}
+                                                            setShowHarvestRecordsConfirmModal={this.setShowHarvestRecordsConfirmModal}
+                                                            addToHarvest={this.addToHarvest}/>
                         </Tab>
                     </Tabs>
                 </div>

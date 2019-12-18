@@ -173,7 +173,7 @@ class TickleRepoIntrospectHarvesting extends React.Component {
                     <Modal.Header closeButton>
                         <Modal.Title>Tøm listen</Modal.Title>
                     </Modal.Header>
-                    <Modal.Body>Send 22 records til høstning?</Modal.Body>
+                    <Modal.Body>Send {this.getRecordsForHarvester(true).length} records til høstning?</Modal.Body>
                     <Modal.Footer>
                         <Button onClick={this.handleRejectHarvestRecords}>
                             Afbryd

@@ -174,11 +174,11 @@ class TickleRepoIntrospectGUI extends React.Component {
                 let curr = this.state.dataSetsForLocalId.indexOf(this.state.dataSet);
                 if( event.keyCode === 38 && curr > 0 ) {
                     this.setState({dataSet: this.state.dataSetsForLocalId[curr - 1]});
-                    this.setNewRecordId(this.state.dataSet + ':' + this.state.localId);
+                    this.setNewRecordId(this.state.dataSetsForLocalId[curr - 1] + ':' + this.state.localId);
                 }
                 if( event.keyCode === 40 && curr < this.state.dataSetsForLocalId.length - 1 ) {
                     this.setState({dataSet: this.state.dataSetsForLocalId[curr + 1]});
-                    this.setNewRecordId(this.state.dataSet + ':' + this.state.localId);
+                    this.setNewRecordId(this.state.dataSetsForLocalId[curr + 1] + ':' + this.state.localId);
                 }
             }
         }
@@ -299,7 +299,8 @@ class TickleRepoIntrospectGUI extends React.Component {
         this.setState({
             dataSet: name,
             dataSetsForLocalId: []
-        })
+        });
+        this.setNewRecordId(name + ':' + this.state.localId);
     }
 
     addToHarvest(records) {

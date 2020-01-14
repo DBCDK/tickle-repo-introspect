@@ -13,6 +13,7 @@ import dk.dbc.ticklerepo.dto.DTOTransformer;
 import dk.dbc.ticklerepo.dto.DataSet;
 import dk.dbc.ticklerepo.dto.DataSetListDTO;
 import dk.dbc.ticklerepo.dto.DataSetSummary;
+import dk.dbc.ticklerepo.dto.DataSetSummaryDTO;
 import dk.dbc.ticklerepo.dto.DataSetSummaryListDTO;
 import dk.dbc.ticklerepo.dto.HarvestRequestDTO;
 import dk.dbc.ticklerepo.dto.HarvestRequestDTOException;
@@ -80,14 +81,27 @@ public class TickleRepoIntrospectService {
 
     @GET
     @Produces({MediaType.APPLICATION_JSON})
-    @Path("datasets")
-    public Response getDataSetSummary() {
-        final List<DataSetSummary> dataSets = tickleRepo.getDataSetSummary();
-        final DataSetSummaryListDTO list = new DataSetSummaryListDTO();
+    @Path("datasets/{submitterId}")
+    public Response getDataSetsBySubmitter(@PathParam("submitterId") int submitterId) {
+        List<DataSet> dataSets = tickleRepo.getDataSetsBySubmitter(submitterId);
 
-        list.setDataSets(DTOTransformer.dataSetSummaryListToDTO(dataSets));
+        DataSetListDTO dto = new DataSetListDTO();
+        dto.setDatasets(dataSets);
 
-        return Response.ok(list, MediaType.APPLICATION_JSON).build();
+        return Response.ok(dto, MediaType.APPLICATION_JSON).build();
+    }
+
+    @GET
+    @Produces({MediaType.APPLICATION_JSON})
+    @Path("datasets/summary/{dataSetId}")
+    public Response getDataSetSummary(@PathParam("dataSetId") int dataSetId) {
+        final DataSetSummary summary = tickleRepo.getDataSetSummaryByDataSetId(dataSetId);
+        if( summary == null ) {
+            return Response.status(Response.Status.NOT_FOUND).entity("No such dataset id " + dataSetId).build();
+        }
+        final DataSetSummaryDTO dto = DTOTransformer.dataSetSummaryToDTO(summary);
+
+        return Response.ok(dto, MediaType.APPLICATION_JSON).build();
     }
 
     @GET

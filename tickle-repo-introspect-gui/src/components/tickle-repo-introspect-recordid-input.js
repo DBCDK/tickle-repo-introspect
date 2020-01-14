@@ -48,6 +48,14 @@ class TickleRepoIntrospectRecordIdInput extends React.Component {
             <label className={'recordId-label'}
                    style={{marginLeft: '5px', marginRight: '20px', float: 'left'}}>
                 <input type='text'
+                       className='submitter-input'
+                       value={this.props.submitter}
+                       onChange={this.props.handleSubmitterChange}
+                       style={{width: 100, paddingBottom: '2px', marginRight: '50px'}}
+                       placeholder={'submitter'}
+                       onKeyDown={this.props.handleLocalIdKeyPress}/>
+                       &nbsp;
+                <input type='text'
                        className='recordid-input'
                        value={this.props.dataSet}
                        onChange={this.props.handleDataSetChange}

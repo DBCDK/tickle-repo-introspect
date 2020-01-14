@@ -27,6 +27,7 @@ class TickleRepoIntrospectGUI extends React.Component {
             record: null,
             recordLoaded: false,
 
+            datasets: [],
             dataSet: '',
             localId: '',
             recordId: '',
@@ -34,6 +35,9 @@ class TickleRepoIntrospectGUI extends React.Component {
             showBlanks: false,
             dataSetsForLocalId: [],
             inputMode: Constants.INPUT_MODE.LOCALID_WITH_LOOKUP,
+
+            submitter: '',
+            datasetIds: [],
 
             recordsToHarvest: [],
             showDeleteHarvestRecordsConfirmModal: false,
@@ -59,6 +63,7 @@ class TickleRepoIntrospectGUI extends React.Component {
         this.handleEscapeKeyPress = this.handleEscapeKeyPress.bind(this);
         this.handleLocalIdKeyPress = this.handleLocalIdKeyPress.bind(this);
         this.handleChangeFormat = this.handleChangeFormat.bind(this);
+        this.handleSubmitterChange = this.handleSubmitterChange.bind(this);
 
         this.setHarvestingTextareaCols = this.setHarvestingTextareaCols.bind(this);
         this.setViewTextareaCols = this.setViewTextareaCols.bind(this);
@@ -102,18 +107,12 @@ class TickleRepoIntrospectGUI extends React.Component {
             view: 'visning'
         });
         this.getRecordFromRecordId(recordId);
-        this.redirectToUrlWithParams("visning", recordId);
+        this.redirectToUrlWithParams("visning", recordId, this.state.submitter);
     }
 
     componentDidMount() {
         if (this.state.instance === '') {
             this.getInstance();
-        }
-
-        // Fetch a list of defined datasets (sources)
-        if (this.state.datasets === undefined) {
-            // List can be empty, hence no default 'datasets' in state
-            this.getDatasets();
         }
 
         // Fetch a list of defined tickle-harvester
@@ -125,8 +124,9 @@ class TickleRepoIntrospectGUI extends React.Component {
         // Check for initial values from the querystring
         const queryParams = queryString.parse(location.search);
         let recordId = queryParams["recordId"] !== undefined ? queryParams["recordId"] : this.state.recordId;
+        let submitter = queryParams["submitter"] !== undefined ? queryParams["submitter"] : this.state.submitter;
         if( queryParams['tab'] === undefined || !["overblik", "visning", 'harvest'].includes(queryParams['tab']) ) {
-            this.redirectToUrlWithParams('overblik', recordId);
+            this.redirectToUrlWithParams('overblik', recordId, submitter);
         } else {
             this.setInitialTab(queryParams["tab"], recordId);
         }
@@ -143,6 +143,14 @@ class TickleRepoIntrospectGUI extends React.Component {
             }
         }
 
+        // If we have an initial submitter, fetch dataset summery
+        if( submitter != '' ) {
+            this.setState({
+                submitter: submitter
+            })
+            this.getDatasetIds(submitter);
+        }
+
         // Add event listener for the escape key (clear dataset/localid)
         document.addEventListener("keydown", this.handleEscapeKeyPress, false);
     }
@@ -151,8 +159,8 @@ class TickleRepoIntrospectGUI extends React.Component {
         document.removeEventListener("keydown", this.handleEscapeKeyPress, false);
     }
 
-    redirectToUrlWithParams(tab, recordId) {
-        let params = "?tab=" + tab + "&recordId=" + recordId
+    redirectToUrlWithParams(tab, recordId, submitter) {
+        let params = "?tab=" + tab + "&recordId=" + recordId + "&submitter=" + submitter
         if( history.replaceState ) {
             window.history.replaceState('', document.title, params);
         } else {
@@ -191,7 +199,7 @@ class TickleRepoIntrospectGUI extends React.Component {
 
     handleTabSelect(view) {
         this.setState({view: view});
-        this.redirectToUrlWithParams(view, this.state.recordId);
+        this.redirectToUrlWithParams(view, this.state.recordId, this.state.submitter);
     }
 
     handleDataSetChange(event) {
@@ -303,6 +311,23 @@ class TickleRepoIntrospectGUI extends React.Component {
         this.setNewRecordId(name + ':' + this.state.localId);
     }
 
+    handleSubmitterChange(event) {
+        let value = event.target.value.replace(/\D/g,'');
+        this.setState({
+            submitter: value
+        });
+
+        if( value.length != 6 ) {
+            this.setState( {
+                datasets: [],
+                dataSetIds: []
+            });
+            return;
+        }
+
+        this.getDatasetIds(value);
+    }
+
     addToHarvest(records) {
         let recordsToHarvest = this.state.recordsToHarvest;
         records.forEach( (record) => {
@@ -330,7 +355,7 @@ class TickleRepoIntrospectGUI extends React.Component {
         });
 
         this.localIdRef.current.focus();
-        this.redirectToUrlWithParams(this.state.view, '');
+        this.redirectToUrlWithParams(this.state.view, '', this.state.submitter);
     }
 
     getInstance() {
@@ -349,12 +374,35 @@ class TickleRepoIntrospectGUI extends React.Component {
             });
     }
 
-    getDatasets() {
+    getDatasetIds(submitter) {
         request
-            .get('/api/v1/datasets')
+            .get('/api/v1/datasets/' + submitter)
             .set('Accepts', 'application/json')
             .then(res => {
-                const datasets = res.body.dataSets;
+                console.log(res);
+                const datasetIds = res.body.datasets;
+                this.setState({
+                    datasetIds: datasetIds
+                });
+
+                for( var i = 0; i < datasetIds.length; i++ ) {
+                    this.getDatasets(datasetIds[i].id);
+                }
+            })
+            .catch(err => {
+                console.log(res);
+                alert(err.message);
+            });
+    }
+
+    getDatasets(id) {
+        request
+            .get('/api/v1/datasets/summary/' + id)
+            .set('Accepts', 'application/json')
+            .then(res => {
+                const summary = res.body;
+                let datasets = this.state.datasets;
+                datasets.push(summary);
                 this.setState({
                     datasets: datasets
                 });
@@ -554,7 +602,9 @@ class TickleRepoIntrospectGUI extends React.Component {
                                                        localIdRef={this.localIdRef}
                                                        handleLocalIdKeyPress={this.handleLocalIdKeyPress}
                                                        handleDataSetSelected={this.handleDataSetSelected}
-                                                       inputMode={this.state.inputMode}/>
+                                                       inputMode={this.state.inputMode}
+                                                       handleSubmitterChange={this.handleSubmitterChange}
+                                                       submitter={this.state.submitter}/>
                 </div>
                 <div>
                     <Tabs activeKey={this.state.view}

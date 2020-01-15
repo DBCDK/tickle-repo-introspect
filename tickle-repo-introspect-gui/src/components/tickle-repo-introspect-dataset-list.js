@@ -17,6 +17,10 @@ class TickleRepoIntrospectDataSetList extends React.Component {
             <div className='dataset-list'
                  style={{
                      width: this.props.getWidthOfDataSetField(),
+                     position: 'absolute',
+                     top: '63px',
+                     left: '159px',
+                     display: 'inline-block',
                      visibility: this.props.dataSetsForLocalId.length > 0 ? 'visible' : 'hidden',
                  }}>
                  {

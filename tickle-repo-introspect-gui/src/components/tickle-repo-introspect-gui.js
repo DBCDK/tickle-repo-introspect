@@ -330,6 +330,10 @@ class TickleRepoIntrospectGUI extends React.Component {
                 dataSetIds: []
             });
             return;
+        } else {
+            this.setState( {
+                view: 'overblik'
+            });
         }
 
         this.getDatasetIds(value);

@@ -15,6 +15,11 @@ import * as Constants from './tickle-repo-introspect-constants';
 
 const request = require('superagent');
 
+const color = { red: '#ff0000',
+                green: '#00ff00',
+                yellow: '#ffd700',
+                white: '#ffffff' };
+
 class TickleRepoIntrospectGUI extends React.Component {
 
     constructor(props) {
@@ -38,6 +43,7 @@ class TickleRepoIntrospectGUI extends React.Component {
 
             submitter: '',
             datasetIds: [],
+            submitterColor: color.white,
 
             recordsToHarvest: [],
             showDeleteHarvestRecordsConfirmModal: false,
@@ -314,7 +320,8 @@ class TickleRepoIntrospectGUI extends React.Component {
     handleSubmitterChange(event) {
         let value = event.target.value.replace(/\D/g,'');
         this.setState({
-            submitter: value
+            submitter: value,
+            submitterColor: color.white
         });
 
         if( value.length != 6 ) {
@@ -375,6 +382,11 @@ class TickleRepoIntrospectGUI extends React.Component {
     }
 
     getDatasetIds(submitter) {
+
+        this.setState({
+            submitterColor: color.yellow
+        });
+
         request
             .get('/api/v1/datasets/' + submitter)
             .set('Accepts', 'application/json')
@@ -388,9 +400,15 @@ class TickleRepoIntrospectGUI extends React.Component {
                 for( var i = 0; i < datasetIds.length; i++ ) {
                     this.getDatasets(datasetIds[i].id);
                 }
+
+                this.setState({
+                    submitterColor: datasetIds.length > 0 ? color.green : color.white
+                });
             })
             .catch(err => {
-                console.log(res);
+                this.setState({
+                    submitterColor: color.red
+                });
                 alert(err.message);
             });
     }
@@ -604,7 +622,8 @@ class TickleRepoIntrospectGUI extends React.Component {
                                                        handleDataSetSelected={this.handleDataSetSelected}
                                                        inputMode={this.state.inputMode}
                                                        handleSubmitterChange={this.handleSubmitterChange}
-                                                       submitter={this.state.submitter}/>
+                                                       submitter={this.state.submitter}
+                                                       submitterColor={this.state.submitterColor}/>
                 </div>
                 <div>
                     <Tabs activeKey={this.state.view}

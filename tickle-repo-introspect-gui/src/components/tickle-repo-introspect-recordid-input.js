@@ -51,7 +51,7 @@ class TickleRepoIntrospectRecordIdInput extends React.Component {
                        className='submitter-input'
                        value={this.props.submitter}
                        onChange={this.props.handleSubmitterChange}
-                       style={{width: 100, paddingBottom: '2px', marginRight: '50px'}}
+                       style={{width: 100, paddingBottom: '2px', marginRight: '50px', background: this.props.submitterColor}}
                        placeholder={'submitter'}
                        onKeyDown={this.props.handleLocalIdKeyPress}/>
                        &nbsp;

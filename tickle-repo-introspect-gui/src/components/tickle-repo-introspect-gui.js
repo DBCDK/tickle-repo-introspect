@@ -5,7 +5,10 @@
 
 import React from "react";
 import {Tab, Tabs} from "react-bootstrap";
-import queryString from 'query-string'
+import queryString from 'query-string';
+
+import { instanceOf } from 'prop-types';
+import { withCookies, Cookies } from 'react-cookie';
 
 import TickleRepoIntrospectOverview from "./overview/tickle-repo-introspect-overview";
 import TickleRepoIntrospectRecordViewer from "./view/tickle-repo-introspect-record-viewer";
@@ -21,6 +24,10 @@ const color = { red: '#ff0000',
                 white: '#ffffff' };
 
 class TickleRepoIntrospectGUI extends React.Component {
+
+    static propTypes = {
+        cookies: instanceOf(Cookies).isRequired
+    };
 
     constructor(props) {
         super(props);
@@ -41,7 +48,7 @@ class TickleRepoIntrospectGUI extends React.Component {
             dataSetsForLocalId: [],
             inputMode: Constants.INPUT_MODE.LOCALID_WITH_LOOKUP,
 
-            submitter: '',
+            submitter: props.cookies.get('submitter') || '',
             datasetIds: [],
             submitterColor: color.white,
 
@@ -336,6 +343,7 @@ class TickleRepoIntrospectGUI extends React.Component {
             });
         }
 
+        this.props.cookies.set('submitter', value);
         this.getDatasetIds(value);
     }
 
@@ -674,5 +682,4 @@ class TickleRepoIntrospectGUI extends React.Component {
     }
 
 }
-
-export default TickleRepoIntrospectGUI;
+export default withCookies(TickleRepoIntrospectGUI);

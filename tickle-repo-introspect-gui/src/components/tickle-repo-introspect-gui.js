@@ -403,7 +403,6 @@ class TickleRepoIntrospectGUI extends React.Component {
             .get('/api/v1/datasets/' + submitter)
             .set('Accepts', 'application/json')
             .then(res => {
-                console.log(res);
                 const datasetIds = res.body.datasets;
                 this.setState({
                     datasetIds: datasetIds

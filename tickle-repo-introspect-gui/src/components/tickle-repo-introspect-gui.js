@@ -157,12 +157,16 @@ class TickleRepoIntrospectGUI extends React.Component {
             }
         }
 
-        // If we have an initial submitter, fetch dataset summery
+        // If we have an initial submitter, from the query line, replace the value that
+        // could exists from a cookie, then fetch dataset summary for the submitter
         if( submitter != '' ) {
             this.setState({
                 submitter: submitter
-            })
+            });
             this.getDatasetIds(submitter);
+        }
+        else if( this.state.submitter != '' ) {
+            this.getDatasetIds(this.state.submitter);
         }
 
         // Add event listener for the escape key (clear dataset/localid)

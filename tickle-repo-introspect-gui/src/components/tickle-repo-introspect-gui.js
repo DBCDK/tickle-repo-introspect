@@ -436,7 +436,10 @@ class TickleRepoIntrospectGUI extends React.Component {
             .set('Accepts', 'application/json')
             .then(res => {
                 const summary = res.body;
-                let datasets = this.state.datasets;
+                let datasets = this.state.datasets
+                    .filter(dataset => {
+                        return dataset.name.substring(0, 6) == this.state.submitter;
+                    });
                 datasets.push(summary);
                 this.setState({
                     datasets: datasets,
@@ -649,7 +652,8 @@ class TickleRepoIntrospectGUI extends React.Component {
                           animation={false}
                           id="tabs">
                         <Tab eventKey={'overblik'} title="Overblik" style={{margin: '10px'}}>
-                            <TickleRepoIntrospectOverview datasets={this.state.datasets}/>
+                            <TickleRepoIntrospectOverview datasets={this.state.datasets}
+                                                          submitter={this.state.submitter}/>
                         </Tab>
                         <Tab eventKey={'visning'} title="Visning" style={{margin: '10px'}}>
                             <TickleRepoIntrospectRecordViewer record={this.state.record}

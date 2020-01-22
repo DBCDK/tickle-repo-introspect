@@ -411,10 +411,6 @@ class TickleRepoIntrospectGUI extends React.Component {
                 const datasetIds = res.body.datasets;
                 this.setState({
                     datasetIds: datasetIds,
-                    submitterColor: color.green
-                });
-
-                this.setState({
                     submitterColor: datasetIds.length > 0 ? color.green : color.grey
                 });
 

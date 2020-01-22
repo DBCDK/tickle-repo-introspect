@@ -13,7 +13,8 @@
     "react-bootstrap-select": "^0.14.0",
     "react-bootstrap-forms": "^0.0.1",
     "style-loader": "^1.0.1",
-    "css-loader": "^3.3.0"
+    "css-loader": "^3.3.0",
+    "react-cookie": "^4.0.3"
   },
   "license": "GPL-3.0",
   "scripts": {

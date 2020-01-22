@@ -6,9 +6,15 @@
 const React = require("react");
 const ReactDOM = require("react-dom");
 
+import {CookiesProvider, useCookies} from 'react-cookie';
+
 import TickleRepoIntrospectGUI from './components/tickle-repo-introspect-gui';
 
 ReactDOM.render(
-    <TickleRepoIntrospectGUI/>,
+    <CookiesProvider>
+        <TickleRepoIntrospectGUI/>
+    </CookiesProvider>,
     document.getElementById('root')
 );
+
+//export default withCookies(App);

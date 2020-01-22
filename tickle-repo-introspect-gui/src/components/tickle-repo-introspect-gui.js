@@ -21,7 +21,8 @@ const request = require('superagent');
 const color = { red: '#ff0000',
                 green: '#00ff00',
                 yellow: '#ffd700',
-                white: '#ffffff' };
+                white: '#ffffff',
+                grey: '#eeeeee'};
 
 class TickleRepoIntrospectGUI extends React.Component {
 
@@ -405,16 +406,17 @@ class TickleRepoIntrospectGUI extends React.Component {
             .then(res => {
                 const datasetIds = res.body.datasets;
                 this.setState({
-                    datasetIds: datasetIds
+                    datasetIds: datasetIds,
+                    submitterColor: color.green
+                });
+
+                this.setState({
+                    submitterColor: datasetIds.length > 0 ? color.green : color.grey
                 });
 
                 for( var i = 0; i < datasetIds.length; i++ ) {
                     this.getDatasets(datasetIds[i].id);
                 }
-
-                this.setState({
-                    submitterColor: datasetIds.length > 0 ? color.green : color.white
-                });
             })
             .catch(err => {
                 this.setState({
@@ -433,7 +435,8 @@ class TickleRepoIntrospectGUI extends React.Component {
                 let datasets = this.state.datasets;
                 datasets.push(summary);
                 this.setState({
-                    datasets: datasets
+                    datasets: datasets,
+                    submitterColor: datasets.length == this.state.datasetIds.length ? color.white : this.state.submitterColor
                 });
             })
             .catch(err => {

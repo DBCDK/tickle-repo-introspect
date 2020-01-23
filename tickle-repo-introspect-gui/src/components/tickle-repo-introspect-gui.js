@@ -22,7 +22,13 @@ const color = { red: '#ff0000',
                 green: '#00ff00',
                 yellow: '#ffd700',
                 white: '#ffffff',
-                grey: '#eeeeee'};
+                grey: '#eeeeee'
+};
+
+const noDataText = {
+    enterSubmitter: 'Indtast en submitter for at se datasæt',
+    loading: 'Indlæser.. vent venligst'
+};
 
 class TickleRepoIntrospectGUI extends React.Component {
 
@@ -59,7 +65,9 @@ class TickleRepoIntrospectGUI extends React.Component {
             selectedHarvester: -1,
 
             harvestingTextareaCols: 10,
-            viewTextareaCols: 10
+            viewTextareaCols: 10,
+
+            overviewNoDataText: noDataText.enterSubmitter
         };
 
         this.getInstance = this.getInstance.bind(this);
@@ -411,7 +419,8 @@ class TickleRepoIntrospectGUI extends React.Component {
                 const datasetIds = res.body.datasets;
                 this.setState({
                     datasetIds: datasetIds,
-                    submitterColor: datasetIds.length > 0 ? color.green : color.grey
+                    submitterColor: datasetIds.length > 0 ? color.green : color.grey,
+                    overviewNoDataText: datasetIds.length > 0 ? noDataText.loading : noDataText.enterSubmitter
                 });
 
                 for( var i = 0; i < datasetIds.length; i++ ) {
@@ -439,7 +448,8 @@ class TickleRepoIntrospectGUI extends React.Component {
                 datasets.push(summary);
                 this.setState({
                     datasets: datasets,
-                    submitterColor: datasets.length == this.state.datasetIds.length ? color.white : this.state.submitterColor
+                    submitterColor: datasets.length == this.state.datasetIds.length ? color.white : this.state.submitterColor,
+                    overviewNoDataText: datasets.length == this.state.datasetIds.length ? noDataText.enterSubmitter : this.state.overviewNoDataText
                 });
             })
             .catch(err => {
@@ -649,7 +659,8 @@ class TickleRepoIntrospectGUI extends React.Component {
                           id="tabs">
                         <Tab eventKey={'overblik'} title="Overblik" style={{margin: '10px'}}>
                             <TickleRepoIntrospectOverview datasets={this.state.datasets}
-                                                          submitter={this.state.submitter}/>
+                                                          submitter={this.state.submitter}
+                                                          overviewNoDataText={this.state.overviewNoDataText}/>
                         </Tab>
                         <Tab eventKey={'visning'} title="Visning" style={{margin: '10px'}}>
                             <TickleRepoIntrospectRecordViewer record={this.state.record}

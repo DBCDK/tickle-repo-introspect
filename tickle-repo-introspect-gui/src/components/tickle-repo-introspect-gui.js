@@ -21,7 +21,8 @@ const request = require('superagent');
 const color = { red: '#ff0000',
                 green: '#00ff00',
                 yellow: '#ffd700',
-                white: '#ffffff' };
+                white: '#ffffff',
+                grey: '#eeeeee'};
 
 class TickleRepoIntrospectGUI extends React.Component {
 
@@ -156,12 +157,16 @@ class TickleRepoIntrospectGUI extends React.Component {
             }
         }
 
-        // If we have an initial submitter, fetch dataset summery
+        // If we have an initial submitter, from the query line, replace the value that
+        // could exists from a cookie, then fetch dataset summary for the submitter
         if( submitter != '' ) {
             this.setState({
                 submitter: submitter
-            })
+            });
             this.getDatasetIds(submitter);
+        }
+        else if( this.state.submitter != '' ) {
+            this.getDatasetIds(this.state.submitter);
         }
 
         // Add event listener for the escape key (clear dataset/localid)
@@ -405,16 +410,13 @@ class TickleRepoIntrospectGUI extends React.Component {
             .then(res => {
                 const datasetIds = res.body.datasets;
                 this.setState({
-                    datasetIds: datasetIds
+                    datasetIds: datasetIds,
+                    submitterColor: datasetIds.length > 0 ? color.green : color.grey
                 });
 
                 for( var i = 0; i < datasetIds.length; i++ ) {
                     this.getDatasets(datasetIds[i].id);
                 }
-
-                this.setState({
-                    submitterColor: datasetIds.length > 0 ? color.green : color.white
-                });
             })
             .catch(err => {
                 this.setState({
@@ -430,10 +432,14 @@ class TickleRepoIntrospectGUI extends React.Component {
             .set('Accepts', 'application/json')
             .then(res => {
                 const summary = res.body;
-                let datasets = this.state.datasets;
+                let datasets = this.state.datasets
+                    .filter(dataset => {
+                        return dataset.name.substring(0, 6) == this.state.submitter;
+                    });
                 datasets.push(summary);
                 this.setState({
-                    datasets: datasets
+                    datasets: datasets,
+                    submitterColor: datasets.length == this.state.datasetIds.length ? color.white : this.state.submitterColor
                 });
             })
             .catch(err => {
@@ -642,7 +648,8 @@ class TickleRepoIntrospectGUI extends React.Component {
                           animation={false}
                           id="tabs">
                         <Tab eventKey={'overblik'} title="Overblik" style={{margin: '10px'}}>
-                            <TickleRepoIntrospectOverview datasets={this.state.datasets}/>
+                            <TickleRepoIntrospectOverview datasets={this.state.datasets}
+                                                          submitter={this.state.submitter}/>
                         </Tab>
                         <Tab eventKey={'visning'} title="Visning" style={{margin: '10px'}}>
                             <TickleRepoIntrospectRecordViewer record={this.state.record}

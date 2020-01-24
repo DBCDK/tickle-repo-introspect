@@ -17,9 +17,17 @@ class TickleRepoIntrospectOverview extends React.Component {
     }
 
     getCurrentSubmitterDatasets() {
+        let exists = [];
         return this.props.datasets
             .filter( dataset => {
                 return dataset.name.substring(0, 6) == this.props.submitter;
+            })
+            .filter( dataset => {
+                if( !exists.includes(dataset.name) ) {
+                    exists.push(dataset.name);
+                    return true;
+                }
+                return false;
             });
     }
 

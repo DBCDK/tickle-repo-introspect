@@ -34,7 +34,7 @@ class TickleRepoIntrospectOverview extends React.Component {
                 }
                 <BootstrapTable data={datasets}
                                 striped={true}
-                                options={{noDataText: 'Indtast submitter id...'}}
+                                options={{noDataText: this.props.overviewNoDataText}}
                                 bodyStyle={{overflow: 'overlay'}}>
                     <TableHeaderColumn dataField='name'
                                        isKey

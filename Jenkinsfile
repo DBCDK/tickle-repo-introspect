@@ -95,5 +95,24 @@ pipeline {
                 }
             }
         }
+        stage("bump docker tag in DIT deployments") {
+                    agent {
+                        docker {
+                            label workerNode
+                            image "docker.dbc.dk/build-env:latest"
+                            alwaysPull true
+                        }
+                    }
+                    when {
+                        branch "master"
+                    }
+                    steps {
+                        script {
+                            sh """
+                                set-new-version services/dataio-tickle-repo-introspect-service-tmpl.yml ${env.GITLAB_PRIVATE_TOKEN} metascrum/dit-gitops-secrets DIT-${env.BUILD_NUMBER} -b master
+                            """
+                        }
+                    }
+                }
     }
 }

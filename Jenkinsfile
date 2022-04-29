@@ -18,7 +18,7 @@ pipeline {
         disableConcurrentBuilds()
     }
     environment {
-        DOCKER_IMAGE_NAME = "docker-io.dbc.dk/tickle-repo-introspect"
+        DOCKER_IMAGE_NAME = "docker-metascrum.artifacts.dbccloud.dk.dk/tickle-repo-introspect"
         DOCKER_IMAGE_VERSION = "${env.BRANCH_NAME}-${env.BUILD_NUMBER}"
         DOCKER_IMAGE_DIT_VERSION = "DIT-${env.BUILD_NUMBER}"
         GITLAB_PRIVATE_TOKEN = credentials("metascrum-gitlab-api-token")
@@ -80,7 +80,7 @@ pipeline {
             agent {
                 docker {
                     label workerNode
-                    image "docker.dbc.dk/build-env:latest"
+                    image "docker-dbc.artifacts.dbccloud.dk/build-env:latest"
                     alwaysPull true
                 }
             }
@@ -99,7 +99,7 @@ pipeline {
                     agent {
                         docker {
                             label workerNode
-                            image "docker.dbc.dk/build-env:latest"
+                            image "docker-dbc.artifacts.dbccloud.dk/build-env:latest"
                             alwaysPull true
                         }
                     }

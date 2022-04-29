@@ -13,7 +13,7 @@ docker run --rm --name tickle-repo-introspect -d \
     -e FLOWSTORE_URL=${FLOWSTORE_URL} \
     -e TICKLE_REPO_HARVESTER_URL=${TICKLE_REPO_HARVESTER_URL} \
     -p ${tickle_repo_introspect_service_port}:8080 \
-    docker-io.dbc.dk/tickle-repo-introspect:devel
+    docker-metascrum.artifacts.dbccloud.dk.dk/tickle-repo-introspect:devel
 
 attempts=0
 max_attempts=60

@@ -6,7 +6,7 @@
 echo "### Starting tickle-repo-introspect service docker ###"
 
 tickle_repo_introspect_service_port=${TICKLE_REPO_INTROSPECT_SERVICE_PORT:-8080}
-docker run --rm --name tickle-repo-introspect \
+docker run --rm --name tickle-repo-introspect -d \
     -e JAVA_MAX_HEAP_SIZE=2G \
     -e INSTANCE=devel \
     -e TICKLE_REPO_URL=${TICKLE_REPO_URL} \
@@ -29,5 +29,5 @@ done
 
 echo ""
 echo "### Status for tickle-repo-introspect service ###"
-curl -vs http://localhost:${tickle_repo_introspect_service_port}/api/status
+curl -vs http://localhost:${tickle_repo_introspect_service_port}/health/ready
 echo ""

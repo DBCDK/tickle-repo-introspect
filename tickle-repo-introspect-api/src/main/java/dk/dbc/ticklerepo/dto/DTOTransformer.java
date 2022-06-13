@@ -7,7 +7,6 @@ package dk.dbc.ticklerepo.dto;
 
 import dk.dbc.dataio.commons.types.AddiMetaData;
 import dk.dbc.dataio.harvester.types.HarvestRecordsRequest;
-import dk.dbc.dataio.harvester.types.HarvestRequest;
 import dk.dbc.dataio.harvester.types.TickleRepoHarvesterConfig;
 import dk.dbc.marc.binding.ControlField;
 import dk.dbc.marc.binding.Field;
@@ -38,16 +37,6 @@ public class DTOTransformer {
 
     static {
         LINE_FORMAT_WRITER.setProperty(LineFormatWriter.Property.INCLUDE_LEADER, true);
-    }
-
-    public static List<DataSetSummaryDTO> dataSetSummaryListToDTO(List<DataSetSummary> dataSetSummaryList) {
-        final List<DataSetSummaryDTO> dtos = new ArrayList<>();
-
-        for (DataSetSummary dataSetSummary : dataSetSummaryList) {
-            dtos.add(dataSetSummaryToDTO(dataSetSummary));
-        }
-
-        return dtos;
     }
 
     public static DataSetSummaryDTO dataSetSummaryToDTO(DataSetSummary dataSetSummary) {
@@ -108,9 +97,9 @@ public class DTOTransformer {
     public static HarvestRecordsRequest HarvestRequestFromDTO(HarvestRequestDTO dto) throws HarvestRequestDTOException {
         List<AddiMetaData> requests = new ArrayList<>();
 
-        for( String recordId : dto.getRecordIds() ) {
+        for (String recordId : dto.getRecordIds()) {
             String[] parts = recordId.split(":");
-            if( parts.length != 2 ) {
+            if (parts.length != 2) {
                 throw new HarvestRequestDTOException("Invalid record id '" + recordId + "' in request for harvester id " + dto.getHarvesterid());
             }
             requests.add(new AddiMetaData().withBibliographicRecordId(parts[1]));

@@ -5,16 +5,17 @@
 
 package dk.dbc.ticklerepo;
 
+import dk.dbc.dataio.common.utils.flowstore.FlowStoreServiceConnectorException;
+import dk.dbc.dataio.common.utils.flowstore.ejb.FlowStoreServiceConnectorBean;
 import dk.dbc.dataio.harvester.connector.ejb.TickleHarvesterServiceConnectorBean;
 import dk.dbc.dataio.harvester.task.connector.HarvesterTaskServiceConnectorException;
-import dk.dbc.dataio.harvester.types.TickleRepoHarvesterConfig;
 import dk.dbc.dataio.harvester.types.HarvestRecordsRequest;
+import dk.dbc.dataio.harvester.types.TickleRepoHarvesterConfig;
 import dk.dbc.ticklerepo.dto.DTOTransformer;
 import dk.dbc.ticklerepo.dto.DataSet;
 import dk.dbc.ticklerepo.dto.DataSetListDTO;
 import dk.dbc.ticklerepo.dto.DataSetSummary;
 import dk.dbc.ticklerepo.dto.DataSetSummaryDTO;
-import dk.dbc.ticklerepo.dto.DataSetSummaryListDTO;
 import dk.dbc.ticklerepo.dto.HarvestRequestDTO;
 import dk.dbc.ticklerepo.dto.HarvestRequestDTOException;
 import dk.dbc.ticklerepo.dto.HarvesterConfigDTO;
@@ -31,11 +32,9 @@ import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.interceptor.Interceptors;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
-import javax.ws.rs.Consumes;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -46,9 +45,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import dk.dbc.dataio.common.utils.flowstore.FlowStoreServiceConnectorException;
-import dk.dbc.dataio.common.utils.flowstore.ejb.FlowStoreServiceConnectorBean;
 
 @Interceptors(StopwatchInterceptor.class)
 @Stateless
@@ -61,9 +57,6 @@ public class TickleRepoIntrospectService {
 
     @EJB
     TickleHarvesterServiceConnectorBean tickleHarvesterServiceConnectorBean;
-
-    @PersistenceContext(unitName = "tickleRepoPU")
-    private EntityManager entityManager;
 
     @EJB
     TickleRepo tickleRepo;
@@ -96,7 +89,7 @@ public class TickleRepoIntrospectService {
     @Path("datasets/summary/{dataSetId}")
     public Response getDataSetSummary(@PathParam("dataSetId") int dataSetId) {
         final DataSetSummary summary = tickleRepo.getDataSetSummaryByDataSetId(dataSetId);
-        if( summary == null ) {
+        if (summary == null) {
             return Response.status(Response.Status.NOT_FOUND).entity("No such dataset id " + dataSetId).build();
         }
         final DataSetSummaryDTO dto = DTOTransformer.dataSetSummaryToDTO(summary);
@@ -174,9 +167,8 @@ public class TickleRepoIntrospectService {
                     .collect(Collectors.toList()));
 
             return Response.ok(result, MediaType.APPLICATION_JSON).build();
-        }
-        catch(FlowStoreServiceConnectorException e) {
-            LOGGER.error("Caught FlowStoreServiceConnectorException: " + e.getMessage());
+        } catch (FlowStoreServiceConnectorException e) {
+            LOGGER.error("Caught FlowStoreServiceConnectorException: {}", e.getMessage());
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
         }
     }
@@ -186,28 +178,26 @@ public class TickleRepoIntrospectService {
     @Path("harvesters/request")
     public Response addHarvestRequest(HarvesterRequestListDTO requestList) {
 
-        final ArrayList<HarvestRequestDTO> successfull = new ArrayList<>();
+        final ArrayList<HarvestRequestDTO> successful = new ArrayList<>();
 
-        for( HarvestRequestDTO dto : requestList.getRequests() ) {
+        for (HarvestRequestDTO dto : requestList.getRequests()) {
             try {
                 HarvestRecordsRequest request = DTOTransformer.HarvestRequestFromDTO(dto);
                 tickleHarvesterServiceConnectorBean.getConnector().createHarvestTask(dto.getHarvesterid(), request);
-                LOGGER.info("Created harvest task for harvester " + dto.getHarvesterid() + " with " + request.getRecords().size() + " records");
-                successfull.add(dto);
-            }
-            catch(HarvestRequestDTOException he) {
-                LOGGER.error("Failed to create HarvestRequest from dto: " + he.getMessage());
-                LOGGER.error("Failing dto was: " + dto.toString());
+                LOGGER.info("Created harvest task for harvester {} with {} records", dto.getHarvesterid(), request.getRecords().size());
+                successful.add(dto);
+            } catch (HarvestRequestDTOException he) {
+                LOGGER.error("Failed to create HarvestRequest from dto: {}", he.getMessage());
+                LOGGER.error("Failing dto was: {}", dto);
                 return Response.status(Response.Status.BAD_REQUEST).entity(he.getMessage()).build();
-            }
-            catch(HarvesterTaskServiceConnectorException ce) {
-                LOGGER.error("Failed to create harvest task: " + ce.getMessage());
+            } catch (HarvesterTaskServiceConnectorException ce) {
+                LOGGER.error("Failed to create harvest task: {}", ce.getMessage());
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ce.getMessage()).build();
             }
         }
 
         final HarvesterRequestListDTO result = new HarvesterRequestListDTO();
-        result.setRequests(successfull);
+        result.setRequests(successful);
 
         return Response.ok(result).build();
     }

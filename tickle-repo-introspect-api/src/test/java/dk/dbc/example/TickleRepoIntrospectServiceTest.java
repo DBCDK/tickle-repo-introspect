@@ -5,10 +5,10 @@ import org.junit.jupiter.api.Test;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-public class TickleRepoIntrospectServiceTest {
+class TickleRepoIntrospectServiceTest {
 
     @Test
-    public void testDummy() {
+    void testDummy() {
         assertThat(true, is(true));
     }
 

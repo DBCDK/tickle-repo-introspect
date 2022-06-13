@@ -18,7 +18,7 @@ public class TickleRepoIntrospectApplication extends Application {
 
     static {
         classes.add(TickleRepoIntrospectService.class);
-        classes.add(Status.class);
+        classes.add(HealthChecks.class);
     }
 
     @Override

@@ -1,8 +1,3 @@
-/*
- * Copyright Dansk Bibliotekscenter a/s. Licensed under GNU GPL v3
- *  See license text at https://opensource.dbc.dk/licenses/gpl-3.0
- */
-
 package dk.dbc.ticklerepo;
 
 import dk.dbc.dataio.common.utils.flowstore.FlowStoreServiceConnectorException;
@@ -117,7 +112,7 @@ public class TickleRepoIntrospectService {
                 .withName(dataSetName);
         final Optional<DataSet> dataSet = tickleRepo.lookupDataSet(lookupDataSet);
 
-        if (!dataSet.isPresent()) {
+        if (dataSet.isEmpty()) {
             // No record found - return null
             return Response.ok(null, MediaType.APPLICATION_JSON).build();
         }
@@ -127,7 +122,7 @@ public class TickleRepoIntrospectService {
                 .withDataset(dataSet.get().getId());
         final Optional<Record> record = tickleRepo.lookupRecord(lookupRecord);
 
-        if (!record.isPresent()) {
+        if (record.isEmpty()) {
             // No datasets found - return null
             return Response.ok(null, MediaType.APPLICATION_JSON).build();
         }

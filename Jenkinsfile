@@ -1,11 +1,11 @@
 #!groovy
 
-def workerNode = "devel10"
+def workerNode = "devel11"
 
 pipeline {
     agent {label workerNode}
     tools {
-        // refers to the name set in manage jenkins -> global tool configuration
+        jdk 'jdk11'
         maven "Maven 3"
     }
     triggers {
@@ -89,7 +89,7 @@ pipeline {
             }
             steps {
                 script {
-                    sh """  
+                    sh """
                         set-new-version services/tickle-repo-introspect.yml ${env.GITLAB_PRIVATE_TOKEN} metascrum/tickle-repo-introspect-secrets ${DOCKER_IMAGE_DIT_VERSION} -b metascrum-staging
                     """
                 }

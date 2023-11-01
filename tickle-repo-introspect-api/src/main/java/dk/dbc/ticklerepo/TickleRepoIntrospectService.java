@@ -18,15 +18,9 @@ import dk.dbc.ticklerepo.dto.HarvesterConfigListDTO;
 import dk.dbc.ticklerepo.dto.HarvesterRequestListDTO;
 import dk.dbc.ticklerepo.dto.Record;
 import dk.dbc.ticklerepo.dto.RecordDTO;
-import dk.dbc.util.StopwatchInterceptor;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
-import jakarta.interceptor.Interceptors;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
@@ -35,13 +29,16 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-@Interceptors(StopwatchInterceptor.class)
 @Stateless
 @Path("v1")
 public class TickleRepoIntrospectService {

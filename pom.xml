@@ -17,7 +17,6 @@
     <artifactId>tickle-repo-introspect</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>tickle-repo-introspect</name>
 
     <modules>
         <module>tickle-repo-introspect-api</module>
@@ -25,13 +24,12 @@
     </modules>
 
     <properties>
+        <dataio-commons-types.version>2.0-SNAPSHOT</dataio-commons-types.version>
         <serviceutils.version>0.1-SNAPSHOT</serviceutils.version>
-        <frontend.maven.plugin.version>1.4</frontend.maven.plugin.version>
+        <frontend.maven.plugin.version>1.14.2</frontend.maven.plugin.version>
         <maven.install.plugin.version>2.5.2</maven.install.plugin.version>
         <maven.javadoc.plugin.version>2.10.1</maven.javadoc.plugin.version>
         <maven.surefire.version>2.20.1</maven.surefire.version>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <skip.install>true</skip.install>
     </properties>
 
@@ -64,7 +62,7 @@
         <dependency>
             <groupId>dk.dbc</groupId>
             <artifactId>tickle-repo-api</artifactId>
-            <version>1.1-SNAPSHOT</version>
+            <version>2.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>dk.dbc</groupId>
@@ -74,16 +72,16 @@
         <dependency>
             <groupId>dk.dbc</groupId>
             <artifactId>dataio-commons-utils-tickle-harvester-service-connector</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>2.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>dk.dbc</groupId>
             <artifactId>dataio-commons-utils-flow-store-service-connector</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>2.0-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>javax</groupId>
-            <artifactId>javaee-api</artifactId>
+            <groupId>jakarta.platform</groupId>
+            <artifactId>jakarta.jakartaee-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -92,14 +90,10 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
-            <version>${junit5.version}</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
-            <version>${junit5.version}</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.hamcrest</groupId>
@@ -116,8 +110,6 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>${mockito.version}</version>
-            <scope>test</scope>
             <exclusions>
                 <exclusion>
                     <groupId>org.hamcrest</groupId>
@@ -134,12 +126,12 @@
         <dependency>
             <groupId>jakarta.xml.ws</groupId>
             <artifactId>jakarta.xml.ws-api</artifactId>
-            <version>2.3.3</version>
+            <version>4.0.0</version>
         </dependency>
         <dependency>
             <groupId>com.sun.xml.ws</groupId>
             <artifactId>jaxws-rt</artifactId>
-            <version>2.3.3</version>
+            <version>4.0.1</version>
         </dependency>
     </dependencies>
 

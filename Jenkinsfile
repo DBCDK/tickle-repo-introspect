@@ -5,7 +5,6 @@ def workerNode = "devel11"
 pipeline {
     agent {label workerNode}
     tools {
-        jdk 'jdk11'
         maven "Maven 3"
     }
     triggers {

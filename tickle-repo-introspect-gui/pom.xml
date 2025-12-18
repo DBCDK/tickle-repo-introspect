@@ -36,7 +36,7 @@
                     </execution>
 
                     <execution>
-                        <id>npm install</id>
+                        <id>npm clean-install</id>
                         <goals>
                             <goal>npm</goal>
                         </goals>

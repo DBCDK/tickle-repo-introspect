@@ -1,6 +1,12 @@
 {
   "name": "tickle-repo-introspect",
+  "description": "Tickle GUI",
   "version": "0.0.1",
+  "license": "GPL-3.0",
+  "scripts": {
+    "build": "webpack -p",
+    "dev-server": "webpack-dev-server"
+  },
   "dependencies": {
     "react": "^16.8.6",
     "react-bootstrap": "^0.32.4",
@@ -16,11 +22,6 @@
     "css-loader": "^3.3.0",
     "react-cookie": "^4.0.3"
   },
-  "license": "GPL-3.0",
-  "scripts": {
-    "build": "webpack -p",
-    "dev-server": "webpack-dev-server"
-  },
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.3",
@@ -31,6 +32,5 @@
     "webpack": "4.35.3",
     "webpack-cli": "3.3.6",
     "webpack-dev-server": "3.7.2"
-  },
-  "description": "Tickle GUI"
+  }
 }

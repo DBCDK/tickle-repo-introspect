@@ -11,6 +11,7 @@ import dk.dbc.marc.reader.MarcXchangeV1Reader;
 import dk.dbc.marc.writer.DanMarc2LineFormatWriter;
 import dk.dbc.marc.writer.LineFormatWriter;
 import dk.dbc.marc.writer.MarcWriterException;
+import dk.dbc.ticklerepo.dto.Record;
 
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;

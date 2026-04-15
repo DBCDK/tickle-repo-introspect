@@ -11,7 +11,7 @@
     <parent>
         <artifactId>tickle-repo-introspect</artifactId>
         <groupId>dk.dbc</groupId>
-        <version>1.0-SNAPSHOT</version>
+        <version>21.0.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>tickle-repo-introspect-gui</artifactId>

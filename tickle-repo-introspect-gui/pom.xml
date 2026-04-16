@@ -46,12 +46,12 @@
                     </execution>
 
                     <execution>
-                        <id>npm run build</id>
+                        <id>webpack</id>
                         <goals>
-                            <goal>npm</goal>
+                            <goal>webpack</goal>
                         </goals>
                         <configuration>
-                            <arguments>run build</arguments>
+                            <arguments>-p</arguments>
                         </configuration>
                     </execution>
                 </executions>

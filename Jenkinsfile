@@ -1,8 +1,8 @@
 #!groovy
 
-def workerNode = "devel11"
-
 @Library('dependency-track')
+
+def workerNode = "devel11"
 
 pipeline {
     agent {label workerNode}

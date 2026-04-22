@@ -26,6 +26,7 @@ import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class DTOTransformer {
     private static final DanMarc2LineFormatWriter DANMARC_2_LINE_FORMAT_WRITER = new DanMarc2LineFormatWriter();
@@ -110,19 +111,23 @@ public class DTOTransformer {
 
             String rawLines = "";
 
-            final Field field001 = record.getField(MarcRecord.hasTag("001")).get(); // All record formats should have field 001
+            final Optional<Field> field001Optional = record.getField(MarcRecord.hasTag("001"));
+            if (field001Optional.isEmpty()) {
+                return "";
+            }
+            final Field field001 = field001Optional.get();
             // Check if the record is marc21. If so use generic line format writer.
             // If not marc21 then Danmarc2 format is assumed and specific line format writer used
             if (field001 instanceof ControlField) {
                 rawLines = new String(LINE_FORMAT_WRITER.write(record, StandardCharsets.UTF_8));
 
                 // Replace all $<single char><value> with <space>$<single char><space><value>. E.g. $aThis is the value -> $a This is the value
-                rawLines = rawLines.replaceAll("(\\$[aA0-zZ9|&])", " $1 ");
+                rawLines = rawLines.replaceAll("(\\$[a-zA-Z0-9|&])", " $1 ");
             } else {
                 rawLines = new String(DANMARC_2_LINE_FORMAT_WRITER.write(record, StandardCharsets.UTF_8));
 
                 // Replace all *<single char><value> with <space>*<single char><space><value>. E.g. *aThis is the value -> *a This is the value
-                rawLines = rawLines.replaceAll("(\\*[aA0-zZ9|&])", " $1 ");
+                rawLines = rawLines.replaceAll("(\\*[a-zA-Z0-9|&])", " $1 ");
 
                 // Replace double space with single space in front of subfield marker
                 rawLines = rawLines.replaceAll(" {2}\\*", " \\*");

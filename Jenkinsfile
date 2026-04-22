@@ -98,7 +98,7 @@ pipeline {
                         env.GIT_SSH_COMMAND = "ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ${sshkeyfile}"
                         sh """
                             nix run --refresh git+https://gitlab.dbc.dk/public-de-team/gitops-secrets-set-variables.git \
-                                metascrum-staging:TICKLE_REPO_INTROSPECT_SERVICE_VERSION=${BRANCH_NAME}-${BUILD_NUMBER}
+                                metascrum-staging:TICKLE_REPO_INTROSPECT_SERVICE_VERSION=${DOCKER_IMAGE_VERSION}
                         """
                     }
                 }
@@ -118,7 +118,7 @@ pipeline {
             steps {
                 script {
                     sh """
-                        set-new-version services/dataio-tickle-repo-introspect-service-tmpl.yml ${env.GITLAB_PRIVATE_TOKEN} metascrum/dit-gitops-secrets DIT-${env.BUILD_NUMBER} -b master
+                        set-new-version services/dataio-tickle-repo-introspect-service-tmpl.yml ${env.GITLAB_PRIVATE_TOKEN} metascrum/dit-gitops-secrets ${DOCKER_IMAGE_DIT_VERSION} -b master
                     """
                 }
             }

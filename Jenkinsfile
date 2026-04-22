@@ -2,6 +2,8 @@
 
 def workerNode = "devel11"
 
+@Library('dependency-track')
+
 pipeline {
     agent {label workerNode}
     tools {
@@ -53,6 +55,17 @@ pipeline {
                       pattern: '**/target/pmd.xml',
                       unstableTotalAll: "0",
                       failedTotalAll: "0"])
+            }
+        }
+        stage("supply-chain gate") {
+            steps {
+                script {
+                    dependencyTrackGate(
+                        projectBom:  'target/sbom-java.json',
+                        projectTeam: 'de-team',
+                        projectType: 'java'
+                    )
+                }
             }
         }
         stage("docker build") {

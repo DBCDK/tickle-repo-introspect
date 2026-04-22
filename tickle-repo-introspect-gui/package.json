@@ -4,8 +4,8 @@
   "version": "0.0.1",
   "license": "GPL-3.0",
   "scripts": {
-    "build": "webpack -p",
-    "dev-server": "webpack-dev-server"
+    "build": "webpack --mode production",
+    "dev-server": "webpack serve"
   },
   "dependencies": {
     "react": "^16.8.6",
@@ -18,8 +18,8 @@
     "react-bootstrap-modal": "^4.2.0",
     "react-bootstrap-select": "^0.14.0",
     "react-bootstrap-forms": "^0.0.1",
-    "style-loader": "^1.0.1",
-    "css-loader": "^3.3.0",
+    "style-loader": "^3.3.4",
+    "css-loader": "^6.11.0",
     "react-cookie": "^4.0.3"
   },
   "devDependencies": {
@@ -29,8 +29,8 @@
     "babel-preset-env": "^1.7.0",
     "babel-preset-stage-0": "^6.24.1",
     "babel-preset-react": "^6.24.1",
-    "webpack": "4.35.3",
-    "webpack-cli": "3.3.6",
-    "webpack-dev-server": "3.7.2"
+    "webpack": "^5.97.0",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^5.0.4"
   }
 }

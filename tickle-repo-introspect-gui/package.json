@@ -18,8 +18,8 @@
     "react-bootstrap-modal": "^4.2.0",
     "react-bootstrap-select": "^0.14.0",
     "react-bootstrap-forms": "^0.0.1",
-    "style-loader": "^3.3.4",
-    "css-loader": "^6.11.0",
+    "style-loader": "^4.0.0",
+    "css-loader": "^7.1.4",
     "react-cookie": "^4.0.3"
   },
   "devDependencies": {

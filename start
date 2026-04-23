@@ -8,7 +8,6 @@ echo "### Starting tickle-repo-introspect service docker ###"
 tickle_repo_introspect_service_port=${TICKLE_REPO_INTROSPECT_SERVICE_PORT:-8080}
 docker run --rm --name tickle-repo-introspect -d \
     -e JAVA_MAX_HEAP_SIZE=2G \
-    -e APP_NAME=tickle-repo-introspect \
     -e INSTANCE=devel \
     -e TICKLE_REPO_URL=${TICKLE_REPO_URL} \
     -e FLOWSTORE_URL=${FLOWSTORE_URL} \

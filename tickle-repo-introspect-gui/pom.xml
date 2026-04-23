@@ -11,7 +11,7 @@
     <parent>
         <artifactId>tickle-repo-introspect</artifactId>
         <groupId>dk.dbc</groupId>
-        <version>1.0-SNAPSHOT</version>
+        <version>21.0.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>tickle-repo-introspect-gui</artifactId>
@@ -31,7 +31,7 @@
                             <goal>install-node-and-npm</goal>
                         </goals>
                         <configuration>
-                            <nodeVersion>v8.9.1</nodeVersion>
+                            <nodeVersion>v22.14.0</nodeVersion>
                         </configuration>
                     </execution>
 
@@ -51,7 +51,7 @@
                             <goal>webpack</goal>
                         </goals>
                         <configuration>
-                            <arguments>-p</arguments>
+                            <arguments>--mode production</arguments>
                         </configuration>
                     </execution>
                 </executions>

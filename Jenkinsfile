@@ -1,5 +1,7 @@
 #!groovy
 
+@Library('dependency-track')
+
 def workerNode = "devel11"
 
 pipeline {
@@ -55,6 +57,17 @@ pipeline {
                       failedTotalAll: "0"])
             }
         }
+        stage("supply-chain gate") {
+            steps {
+                script {
+                    dependencyTrackGate(
+                        projectBom:  'target/sbom-java.json',
+                        projectTeam: 'de-team',
+                        projectType: 'java'
+                    )
+                }
+            }
+        }
         stage("docker build") {
             when {
                 expression {
@@ -75,7 +88,23 @@ pipeline {
                 }
             }
         }
-        stage("bump docker tag in staging deployments") {
+        stage("Update staging version number") {
+            when {
+                branch "master"
+            }
+            steps {
+                script {
+                    withCredentials([sshUserPrivateKey(credentialsId: "gitlab-isworker", keyFileVariable: "sshkeyfile")]) {
+                        env.GIT_SSH_COMMAND = "ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ${sshkeyfile}"
+                        sh """
+                            nix run --refresh git+https://gitlab.dbc.dk/public-de-team/gitops-secrets-set-variables.git \
+                                metascrum-staging:TICKLE_REPO_INTROSPECT_SERVICE_VERSION=${DOCKER_IMAGE_VERSION}
+                        """
+                    }
+                }
+            }
+        }
+        stage("Update DIT version number") {
             agent {
                 docker {
                     label workerNode
@@ -89,29 +118,10 @@ pipeline {
             steps {
                 script {
                     sh """
-                        set-new-version services/tickle-repo-introspect.yml ${env.GITLAB_PRIVATE_TOKEN} metascrum/tickle-repo-introspect-secrets ${DOCKER_IMAGE_DIT_VERSION} -b metascrum-staging
+                        set-new-version services/dataio-tickle-repo-introspect-service-tmpl.yml ${env.GITLAB_PRIVATE_TOKEN} metascrum/dit-gitops-secrets ${DOCKER_IMAGE_DIT_VERSION} -b master
                     """
                 }
             }
         }
-        stage("bump docker tag in DIT deployments") {
-                    agent {
-                        docker {
-                            label workerNode
-                            image "docker-dbc.artifacts.dbccloud.dk/build-env:latest"
-                            alwaysPull true
-                        }
-                    }
-                    when {
-                        branch "master"
-                    }
-                    steps {
-                        script {
-                            sh """
-                                set-new-version services/dataio-tickle-repo-introspect-service-tmpl.yml ${env.GITLAB_PRIVATE_TOKEN} metascrum/dit-gitops-secrets DIT-${env.BUILD_NUMBER} -b master
-                            """
-                        }
-                    }
-                }
     }
 }

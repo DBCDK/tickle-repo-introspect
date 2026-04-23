@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 
-echo "### testing tickle-repo-introspect project ###"
+echo "### Analyze source code and javadoc ###"
 
-mvn verify || exit 1
+mvn package pmd:pmd javadoc:aggregate -DskipTests || exit 1

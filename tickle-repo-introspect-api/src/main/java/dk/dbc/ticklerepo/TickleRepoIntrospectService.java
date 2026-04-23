@@ -130,7 +130,7 @@ public class TickleRepoIntrospectService {
     }
 
     @GET
-    @Produces({MediaType.TEXT_PLAIN})
+    @Produces({MediaType.APPLICATION_JSON})
     @Path("datasets/by-local-id/{localId}")
     public Response getDataSetsByRecordId(@PathParam("localId") String localId) {
         final Record lookupRecord = new Record()
@@ -145,7 +145,7 @@ public class TickleRepoIntrospectService {
     }
 
     @GET
-    @Produces({MediaType.TEXT_PLAIN})
+    @Produces({MediaType.APPLICATION_JSON})
     @Path("harvesters")
     public Response getHarvesters() {
 
@@ -167,6 +167,7 @@ public class TickleRepoIntrospectService {
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
     @Path("harvesters/request")
     public Response addHarvestRequest(HarvesterRequestListDTO requestList) {
 
